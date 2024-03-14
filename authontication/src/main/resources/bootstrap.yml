@@ -2,8 +2,7 @@ spring:
   config:
     import: "configserver:http://localhost:8080"
   application:
-    name: authentication
+    name: authentication-dev
   profiles:
     active: dev
-server:
-  port: 8081
+
