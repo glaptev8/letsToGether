@@ -28,6 +28,7 @@ dependencies {
   implementation 'org.flywaydb:flyway-core'
   implementation 'org.springframework:spring-jdbc'
   implementation 'org.springframework.cloud:spring-cloud-starter-config'
+  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
   compileOnly 'org.projectlombok:lombok'
   runtimeOnly 'org.postgresql:postgresql'
   runtimeOnly 'org.postgresql:r2dbc-postgresql'

@@ -4,10 +4,8 @@ spring:
       ddl-auto: create
     show-sql: true
   r2dbc:
-    url: ""
     username: "postgres"
     password: "postgres"
   flyway:
-    url: ${FLYWAY_DATASOURCE_URL}
     user: "postgres"
     password: "postgres"

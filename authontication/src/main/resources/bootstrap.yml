@@ -1,8 +1,7 @@
 spring:
+  config:
+    import: "configserver:http://localhost:8080"
   application:
     name: authentication
-  cloud:
-    config:
-      uri: http://localhost:8080
   profiles:
     active: dev
