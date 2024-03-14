@@ -1,9 +1,5 @@
 spring:
   r2dbc:
-    user: postgres
-    password: postgres
     url: r2dbc:pool:postgres://localhost:5432/authentication
   flyway:
-    user: postgres
-    password: postgres
     url: jdbc:postgresql://localhost:5432/authentication
