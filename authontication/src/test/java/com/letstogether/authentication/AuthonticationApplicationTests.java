@@ -1,4 +1,4 @@
-package com.letstogether.authontication;
+package com.letstogether.authentication;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

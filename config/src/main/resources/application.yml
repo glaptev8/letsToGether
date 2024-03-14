@@ -1,9 +1,11 @@
 spring:
   application:
     name: config
+
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/glaptev8/config
+          uri: https://github.com/glaptev8/letsToGether
+          searchPaths: config
           clone-on-start: true
