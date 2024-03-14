@@ -5,3 +5,5 @@ spring:
     name: authentication
   profiles:
     active: dev
+server:
+  port: 8081
