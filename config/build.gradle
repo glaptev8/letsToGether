@@ -1,0 +1,33 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version "$springframework"
+  id 'io.spring.dependency-management' version "$dependencymanagement"
+}
+
+group = 'com.letstogether'
+version = '0.0.1-SNAPSHOT'
+
+java {
+  sourceCompatibility = '21'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.springframework.cloud:spring-cloud-config-server'
+
+//  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
