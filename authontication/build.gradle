@@ -2,7 +2,6 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version "$springframework"
   id 'io.spring.dependency-management' version "$dependencymanagement"
-  id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 group = 'com.letstogether'
@@ -26,12 +25,16 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'org.flywaydb:flyway-core'
-  implementation 'org.springframework:spring-jdbc'
   implementation 'org.springframework.cloud:spring-cloud-starter-config'
   implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+
   compileOnly 'org.projectlombok:lombok'
+  compileOnly "org.mapstruct:mapstruct:$mapStructVersion"
+
   runtimeOnly 'org.postgresql:postgresql'
   runtimeOnly 'org.postgresql:r2dbc-postgresql'
+
+  annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
