@@ -2,6 +2,6 @@ spring:
   config:
     import: "configserver:http://localhost:8080"
   application:
-    name: authentication-dev
+    name: authentication
   profiles:
     active: dev

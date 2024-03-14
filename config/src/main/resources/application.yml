@@ -9,3 +9,5 @@ spring:
           searchPaths: config/src/main/resources
           clone-on-start: true
           force-pull: true
+  profiles:
+    active: dev
