@@ -9,7 +9,3 @@ spring:
       uri: http://localhost:8080
       name: authentication
       profile: dev
-  profiles:
-    active: dev
-
-

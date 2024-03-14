@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  r2dbc:
+    username: postgres
+    password: postgres
+  flyway:
+    user: postgres
+    password: postgres
