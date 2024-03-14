@@ -3,3 +3,6 @@ spring:
     url: "r2dbc:pool:postgres://localhost:5432/authentication"
   flyway:
     url: "jdbc:postgresql://localhost:5432/authentication"
+
+server:
+  port: 8081
