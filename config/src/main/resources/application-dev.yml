@@ -4,8 +4,8 @@ spring:
       ddl-auto: create
     show-sql: true
   r2dbc:
-    username: "postgres"
-    password: "postgres"
+    username: postgres
+    password: postgres
   flyway:
-    user: "postgres"
-    password: "postgres"
+    user: postgres
+    password: postgres
