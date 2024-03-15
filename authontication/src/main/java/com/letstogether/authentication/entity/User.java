@@ -6,12 +6,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.letstogether.authentication.annotation.CreateRepository;
 import com.letstogether.authentication.dto.GenderType;
 
 @Table("users")
-@CreateRepository
-public record Users(
+public record User(
   @Id
   Long id,
   String firstName,

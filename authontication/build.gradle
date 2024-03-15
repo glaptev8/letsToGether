@@ -19,6 +19,14 @@ configurations {
 
 repositories {
   mavenCentral()
+  maven {
+    url = 'http://localhost:8083/repository/maven-snapshots'
+    credentials {
+      username = "admin"
+      password = "Hyper1990!"
+    }
+    allowInsecureProtocol true
+  }
 }
 
 dependencies {

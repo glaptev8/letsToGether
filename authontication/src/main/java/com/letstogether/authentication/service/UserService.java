@@ -1,11 +1,9 @@
 package com.letstogether.authentication.service;
 
-import org.springframework.stereotype.Service;
+import com.letstogether.authentication.entity.User;
+import reactor.core.publisher.Mono;
 
-import lombok.RequiredArgsConstructor;
+public interface UserService {
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-
+  Mono<User> saveUser(User user);
 }
