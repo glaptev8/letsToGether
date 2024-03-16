@@ -5,7 +5,8 @@ spring:
     name: eureka
   cloud:
     config:
-      enabled: true
-      uri: http://localhost:8080
+      discovery:
+        service-id: config
+        enabled: true
       name: eureka
       profile: dev
