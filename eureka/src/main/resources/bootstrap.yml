@@ -1,12 +1,9 @@
 spring:
-  config:
-    import: "configserver:"
   application:
     name: eureka
-  cloud:
-    config:
-      discovery:
-        service-id: config
-        enabled: true
-      name: eureka
-      profile: dev
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+server:
+  port: 8761
