@@ -13,7 +13,6 @@ import com.letstogether.authentication.security.CustomPrincipal;
 import com.letstogether.authentication.security.TokenDetails;
 import com.letstogether.authentication.service.UserService;
 import com.letstogether.dto.UserDto;
-import jakarta.ws.rs.HeaderParam;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 

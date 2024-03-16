@@ -25,7 +25,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-    log.info("test");
     String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
     return webClient.post()
@@ -35,12 +34,10 @@ public class AuthFilter implements GlobalFilter, Ordered {
       .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Unauthorized")))
       .bodyToMono(Long.class)
       .flatMap(userId -> {
-        log.info(String.valueOf(userId));
         exchange.getRequest().mutate().header("userId", userId.toString()).build();
         return chain.filter(exchange);
       })
       .onErrorResume(e -> {
-        log.info(e.getMessage());
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
       });
