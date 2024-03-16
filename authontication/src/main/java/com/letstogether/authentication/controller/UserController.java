@@ -47,7 +47,7 @@ public class UserController {
     return Mono.just(principal.id());
   }
 
-  @PostMapping("test")
+  @PostMapping("/test")
   public Mono<Long> test(@RequestHeader("userId") Long userId) {
     return Mono.just(userId);
   }

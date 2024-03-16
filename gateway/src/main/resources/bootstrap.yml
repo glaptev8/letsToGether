@@ -9,3 +9,16 @@ spring:
       uri: http://localhost:8080
       name: gateway
       profile: dev
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE

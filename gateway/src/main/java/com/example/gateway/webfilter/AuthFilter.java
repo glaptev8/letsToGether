@@ -1,6 +1,7 @@
 package com.example.gateway.webfilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -17,10 +18,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthFilter implements GlobalFilter, Ordered {
   private final WebClient webClient;
-
   @Autowired
-  public AuthFilter(WebClient.Builder webClientBuilder) {
-    this.webClient = webClientBuilder.baseUrl("http://authentication").build();
+  public AuthFilter(WebClient.Builder webClientBuilder, ReactorLoadBalancerExchangeFilterFunction lbFunction) {
+    this.webClient = webClientBuilder.baseUrl("http://authentication").filter(lbFunction).build();
   }
 
   @Override
@@ -36,7 +36,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
       .bodyToMono(Long.class)
       .flatMap(userId -> {
         log.info(String.valueOf(userId));
-        exchange.getRequest().mutate().header("UserId", userId.toString()).build();
+        exchange.getRequest().mutate().header("userId", userId.toString()).build();
         return chain.filter(exchange);
       })
       .onErrorResume(e -> {

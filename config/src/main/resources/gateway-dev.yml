@@ -10,8 +10,6 @@ spring:
           uri: lb://authentication # Используйте имя сервиса авторизации, зарегистрированное в Eureka
           predicates:
             - Path=/auth/** # Предполагаем, что все запросы к сервису авторизации идут через /auth
-          filters:
-            - RewritePath=/auth/(?<segment>.*), /$\{segment}
 logging:
   level:
     reactor.netty.http.client.HttpClient: DEBUG
