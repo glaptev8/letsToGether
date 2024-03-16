@@ -3,6 +3,7 @@ package com.letstogether.authentication.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,11 +13,12 @@ import com.letstogether.authentication.security.CustomPrincipal;
 import com.letstogether.authentication.security.TokenDetails;
 import com.letstogether.authentication.service.UserService;
 import com.letstogether.dto.UserDto;
+import jakarta.ws.rs.HeaderParam;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/user/v1")
+@RequestMapping("/auth/v1")
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
@@ -37,5 +39,16 @@ public class UserController {
   public Mono<UserDto> updateUser(@RequestBody User user) {
     return userService.updateUser(user)
       .map(mapper::fromUser);
+  }
+
+  @PostMapping
+  public Mono<Long> auth(Authentication authentication) {
+    var principal = (CustomPrincipal)authentication.getPrincipal();
+    return Mono.just(principal.id());
+  }
+
+  @PostMapping("test")
+  public Mono<Long> test(@RequestHeader("userId") Long userId) {
+    return Mono.just(userId);
   }
 }
