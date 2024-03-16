@@ -4,14 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-
+@Slf4j
 @Component
 public class AuthFilter implements GlobalFilter, Ordered {
   private final WebClient webClient;
@@ -23,19 +25,22 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-    String token = exchange.getRequest().getHeaders().getFirst("Authorization");
+    log.info("test");
+    String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
     return webClient.post()
-      .uri("/auth/v1/")
+      .uri("/auth/v1")
       .header("Authorization", token)
       .retrieve()
       .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Unauthorized")))
       .bodyToMono(Long.class)
       .flatMap(userId -> {
-         exchange.getRequest().mutate().header("UserId", userId.toString()).build();
+        log.info(String.valueOf(userId));
+        exchange.getRequest().mutate().header("UserId", userId.toString()).build();
         return chain.filter(exchange);
       })
       .onErrorResume(e -> {
+        log.info(e.getMessage());
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
       });
