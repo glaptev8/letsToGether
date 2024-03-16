@@ -9,3 +9,7 @@ spring:
       uri: http://localhost:8080
       name: authentication
       profile: dev
+logging:
+  level:
+    org:
+      springframework.boot: DEBUG
