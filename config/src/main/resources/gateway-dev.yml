@@ -6,7 +6,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: authorization-service
+        - id: authorization
           uri: lb://authentication # Используйте имя сервиса авторизации, зарегистрированное в Eureka
           predicates:
             - Path=/auth/** # Предполагаем, что все запросы к сервису авторизации идут через /auth
