@@ -6,18 +6,26 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.letstogether.authentication.dto.GenderType;
+import com.letstogether.dto.GenderType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 @Table("users")
-public record User(
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+
   @Id
-  Long id,
-  String firstName,
-  String lastName,
-  GenderType gender,
-  Integer are,
-  String email,
-  String phone,
+  private Long id;
+  private String firstName;
+  private String password;
+  private String lastName;
+  private GenderType gender;
+  private Integer age;
+  private String email;
+  private String phone;
   @CreatedDate
-  LocalDateTime createdAt
-  ) {}
+  private LocalDateTime createdAt;
+}

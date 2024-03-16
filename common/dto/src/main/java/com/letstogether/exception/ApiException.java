@@ -1,7 +1,10 @@
-package com.letstogether.authentication.exception;
+package com.letstogether.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ApiException extends RuntimeException {
-  private String code;
+  protected String code;
   public ApiException(String code, String message) {
     super(message);
     this.code = code;

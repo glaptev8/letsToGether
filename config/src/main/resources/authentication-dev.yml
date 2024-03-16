@@ -5,3 +5,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/authentication
 server:
   port: 8081
+
+jwt:
+  secret: 426b1066314ea793aa5d0907d7323310eef672ab280958f1f667be70c61c9abf
+  expiration: 3600
+  issuer: letstogether

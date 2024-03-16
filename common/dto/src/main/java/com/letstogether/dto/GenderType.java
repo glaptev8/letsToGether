@@ -1,4 +1,4 @@
-package com.letstogether.authentication.dto;
+package com.letstogether.dto;
 
 public enum GenderType {
   MALE,

@@ -20,7 +20,7 @@ configurations {
 repositories {
   mavenCentral()
   maven {
-    url = 'http://localhost:8083/repository/maven-snapshots'
+    url = 'http://localhost:8090/repository/maven-snapshots'
     credentials {
       username = "admin"
       password = "Hyper1990!"
@@ -32,18 +32,27 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
-  implementation 'org.flywaydb:flyway-core'
   implementation 'org.springframework.cloud:spring-cloud-starter-config'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+  implementation "io.jsonwebtoken:jjwt:$jsonWebTokenVersion"
+  implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+  implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
   implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 
+  implementation "com.letstogether:dto:$dto"
+  implementation "com.letstogether:message-source-starter:$messagesource"
+
   compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
   compileOnly "org.mapstruct:mapstruct:$mapStructVersion"
 
+  implementation 'org.flywaydb:flyway-core'
   runtimeOnly 'org.postgresql:postgresql'
   runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
-  annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
-  annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
 }
