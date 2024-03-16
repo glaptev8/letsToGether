@@ -2,10 +2,10 @@ spring:
   config:
     import: "configserver:"
   application:
-    name: authentication
+    name: eureka
   cloud:
     config:
       enabled: true
       uri: http://localhost:8080
-      name: authentication
+      name: eureka
       profile: dev
