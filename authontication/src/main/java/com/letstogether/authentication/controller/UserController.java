@@ -14,8 +14,10 @@ import com.letstogether.authentication.security.TokenDetails;
 import com.letstogether.authentication.service.UserService;
 import com.letstogether.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth/v1")
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class UserController {
 
   @PostMapping("/register")
   public Mono<UserDto> saveUser(@RequestBody User user) {
+    log.info("saving Controller");
     return userService.saveUser(user)
       .map(mapper::fromUser);
   }
@@ -47,7 +50,7 @@ public class UserController {
   }
 
   @PostMapping("/test")
-  public Mono<Long> test(@RequestHeader("userId") Long userId) {
+  public Mono<Long> test(@RequestHeader("X-USER-ID") Long userId) {
     return Mono.just(userId);
   }
 }

@@ -45,7 +45,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
       .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.error(new RuntimeException("Unauthorized")))
       .bodyToMono(Long.class)
       .flatMap(userId -> {
-        exchange.getRequest().mutate().header("userId", userId.toString()).build();
+        exchange.getRequest().mutate().header("X-USER-ID", userId.toString()).build();
         return chain.filter(exchange);
       })
       .onErrorResume(e -> {
