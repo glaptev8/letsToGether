@@ -6,4 +6,4 @@ spring:
   flyway:
     url: jdbc:postgresql://localhost:5432/event
 server:
-  port: 8082
+  port: 8083
