@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: event2
   r2dbc:
     url: r2dbc:pool:postgres://localhost:5432/event
   flyway:

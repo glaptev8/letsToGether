@@ -1,6 +1,6 @@
 spring:
   application:
-    name: authentication3
+    name: authentication
   r2dbc:
     url: r2dbc:pool:postgres://localhost:5432/authentication
   flyway:
