@@ -1,6 +1,8 @@
 spring:
   config:
     import: "configserver:"
+  application:
+    name: event
   cloud:
     config:
       discovery:
@@ -8,6 +10,7 @@ spring:
         enabled: true
       name: event
       profile: dev
+
 springdoc:
   swagger-ui:
     path: /auth/swagger-ui.html

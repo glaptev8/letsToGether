@@ -2,7 +2,6 @@ package com.letstogether.authentication.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
 import com.letstogether.authentication.entity.User;
 import com.letstogether.dto.UserDto;
