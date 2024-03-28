@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class WebSecurityConfig {
   @Value("${jwt.secret}")
   private String secret;
-  private final String[] publicRoutes = new String[]{"/auth/v1/login", "/auth/v1/register", "/auth/v1/test"};
+  private final String[] publicRoutes = new String[]{"/auth/v1/login", "/auth/v1/register", "/auth/v1/test", "/auth/swagger-ui.html"};
   @Bean
   public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) {
     return http

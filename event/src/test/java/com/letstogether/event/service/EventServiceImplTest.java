@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.TestPropertySource;
 
 import com.letstogether.dto.ActivityGroup;
@@ -27,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ComponentScan(lazyInit = true)
 @Import(TestEnvironmentConfig.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
 class EventServiceImplTest extends TestContainerConfig {
 
   @Autowired

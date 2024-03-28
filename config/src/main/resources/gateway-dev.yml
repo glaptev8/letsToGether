@@ -7,6 +7,10 @@ spring:
     gateway:
       routes:
         - id: authorization
-          uri: lb://authentication # Используйте имя сервиса авторизации, зарегистрированное в Eureka
+          uri: lb://authentication
           predicates:
-            - Path=/auth/** # Предполагаем, что все запросы к сервису авторизации идут через /auth
+            - Path=/auth/**
+        - id: event
+          uri: lb://event
+          predicates:
+            - Path=/event/**

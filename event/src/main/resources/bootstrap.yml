@@ -6,12 +6,8 @@ spring:
       discovery:
         service-id: config
         enabled: true
-      name: authentication
+      name: event
       profile: dev
-
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html
-
-upload:
-  path: /Users/glelap/IdeaProjects/letsToGether/authentication/avatar/
+    path: /auth/swagger-ui.html

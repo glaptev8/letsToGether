@@ -1,10 +1,13 @@
 package com.letstogether.authentication.controller;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.letstogether.authentication.entity.User;
@@ -25,10 +28,10 @@ public class UserController {
   private final UserService userService;
   private final MapStructMapper mapper;
 
-  @PostMapping("/register")
-  public Mono<UserDto> saveUser(@RequestBody User user) {
+  @PostMapping(path = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public Mono<UserDto> saveUser(@RequestBody User user, @RequestPart(value = "avatar") FilePart avatar) {
     log.info("saving Controller");
-    return userService.saveUser(user)
+    return userService.saveUser(user, avatar)
       .map(mapper::fromUser);
   }
 

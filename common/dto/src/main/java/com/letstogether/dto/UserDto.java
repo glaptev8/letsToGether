@@ -5,6 +5,7 @@ public record UserDto(
   String lastName,
   GenderType gender,
   Integer age,
+  String pathToAvatar,
   String email,
   String phone
 ) {

@@ -37,9 +37,9 @@ public class EventController {
       .map(mapper::toDto);
   }
 
-  @GetMapping("/byuser/{userId}")
-  public Flux<EventDto> getEventsByUserId(@PathVariable Long userId) {
-    return eventService.getUsersEventsByUserId(userId)
+  @PostMapping("/byuser/{userId}")
+  public Flux<EventDto> getEventsByUserId(@RequestHeader("X-USER-ID") Long ownUserId, @PathVariable(required = false) Long userId) {
+    return eventService.getUsersEventsByUserId(userId == null ? ownUserId : userId)
       .map(mapper::toDto);
   }
 
