@@ -1,0 +1,271 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8083
+    description: Generated server url
+paths:
+  /event/v1:
+    get:
+      tags:
+        - event-controller
+      operationId: getEvents
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+    post:
+      tags:
+        - event-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EventDto'
+  /event/v1/byuser/{userId}:
+    post:
+      tags:
+        - event-controller
+      operationId: getEventsByUserId
+      parameters:
+        - name: X-USER-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+  /event/v1/byfilter:
+    post:
+      tags:
+        - event-controller
+      operationId: postEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventFilterDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+  /event/v1/{id}:
+    get:
+      tags:
+        - event-controller
+      operationId: getEvent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EventDto'
+  /event/v1/users:
+    get:
+      tags:
+        - event-controller
+      operationId: getUsers
+      parameters:
+        - name: X-USER-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventDto'
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - COMPLETED
+            - IN_PROGRESS
+            - PLANNING
+            - CLOSED
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        activityType:
+          type: string
+          enum:
+            - FOOTBALL
+            - BASKETBALL
+            - RUNNING
+            - NIGHTCLUB
+            - CINEMA
+            - RESTAURANT
+            - SPEAKING_CLUB
+            - LECTURE
+        description:
+          type: string
+        address:
+          type: string
+        lng:
+          type: integer
+          format: int64
+        lat:
+          type: integer
+          format: int64
+        creatorId:
+          type: integer
+          format: int64
+        minParticipant:
+          type: integer
+          format: int32
+        maxParticipant:
+          type: integer
+          format: int32
+    EventDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - COMPLETED
+            - IN_PROGRESS
+            - PLANNING
+            - CLOSED
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        activityType:
+          type: string
+          enum:
+            - FOOTBALL
+            - BASKETBALL
+            - RUNNING
+            - NIGHTCLUB
+            - CINEMA
+            - RESTAURANT
+            - SPEAKING_CLUB
+            - LECTURE
+        description:
+          type: string
+        address:
+          type: string
+        lng:
+          type: integer
+          format: int64
+        lat:
+          type: integer
+          format: int64
+        creatorId:
+          type: integer
+          format: int64
+        minParticipant:
+          type: integer
+          format: int32
+        maxParticipant:
+          type: integer
+          format: int32
+    EventFilterDto:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        eventStatus:
+          type: string
+          enum:
+            - COMPLETED
+            - IN_PROGRESS
+            - PLANNING
+            - CLOSED
+        activityType:
+          type: string
+          enum:
+            - FOOTBALL
+            - BASKETBALL
+            - RUNNING
+            - NIGHTCLUB
+            - CINEMA
+            - RESTAURANT
+            - SPEAKING_CLUB
+            - LECTURE
+        activityGroup:
+          type: string
+          enum:
+            - SPORT
+            - ENTERTAINMENT
+            - EDUCATION
+        offset:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32

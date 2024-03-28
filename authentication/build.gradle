@@ -41,8 +41,8 @@ dependencies {
   implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
   implementation "io.jsonwebtoken:jjwt:$jsonWebTokenVersion"
-  implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
-  implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
+//  implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+//  implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
 
   implementation "com.letstogether:dto:$dto"
   implementation "com.letstogether:message-source-starter:$messagesource"

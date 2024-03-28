@@ -34,20 +34,22 @@ public class UserServiceImpl implements UserService {
   public Mono<User> saveUser(User user, FilePart avatar) {
     log.info("saving user {}", user);
     return savePhoto(avatar)
-      .flatMap(pathToFile ->
-                 userRepository.existsByEmailOrPhone(user.getEmail(), user.getPhone())
-                   .flatMap(exists -> {
-                     if (exists) {
-                       return Mono.error(new UserExistsException(
-                         messageSourceService.logMessage("user.not.exits.code"),
-                         messageSourceService.logMessage("user.not.exits.message"))
-                       );
-                     }
-                     user.setPassword(passwordEncoder.encode(user.getPassword()));
-                     user.setPathToAvatar(pathToFile);
-                     return userRepository.save(user);
-                   })
-                   .doOnNext(savedUser -> log.info("user was saved: {}", savedUser)));
+      .flatMap(pathToFile -> {
+        user.setPathToAvatar(pathToFile);
+        return Mono.empty();
+      })
+      .then(userRepository.existsByEmailOrPhone(user.getEmail(), user.getPhone())
+              .flatMap(exists -> {
+                if (exists) {
+                  return Mono.error(new UserExistsException(
+                    messageSourceService.logMessage("user.exits.code"),
+                    messageSourceService.logMessage("user.exits.message"))
+                  );
+                }
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                return userRepository.save(user);
+              })
+              .doOnNext(savedUser -> log.info("user was saved: {}", savedUser)));
   }
 
   @Override
@@ -62,6 +64,9 @@ public class UserServiceImpl implements UserService {
 
   private Mono<String> savePhoto(FilePart avatar) {
     log.info("saving photo {}", avatar);
+    if (avatar == null) {
+      return Mono.empty();
+    }
     var pathToFile = new StringBuilder();
     var newAvatarName = UUID.randomUUID() + "_" + avatar.filename();
     pathToFile.append(uploadPath).append(newAvatarName);

@@ -23,11 +23,35 @@ import reactor.core.publisher.Mono;
 @EnableReactiveMethodSecurity
 @ConditionalOnProperty("jwt.secret")
 public class WebSecurityConfig {
+
   @Value("${jwt.secret}")
   private String secret;
-  private final String[] publicRoutes = new String[]{"/auth/v1/login", "/auth/v1/register", "/auth/v1/test", "/auth/swagger-ui.html"};
+  private final String[] publicRoutes = new String[]{
+    "/auth/v1/login",
+    "/auth/v1/register",
+    "/auth/v1/test",
+    "/auth/v2/api-docs",
+    "/auth/swagger-resources",
+    "/auth/swagger-resources/**",
+    "/auth/configuration/ui",
+    "/auth/configuration/security",
+    "/auth/swagger-ui.html",
+    "/auth/webjars/**",
+    "/auth/v3/api-docs/**",
+    "/auth/swagger-ui/**",
+    "/v2/api-docs",
+    "/swagger-resources",
+    "/swagger-resources/**",
+    "/configuration/ui",
+    "/configuration/security",
+    "/swagger-ui.html",
+    "/webjars/**",
+    "/v3/api-docs/**",
+    "/swagger-ui/**"};
+
   @Bean
-  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) {
+  public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
+                                                       AuthenticationManager authenticationManager) {
     return http
       .csrf().disable()
       .authorizeExchange()
