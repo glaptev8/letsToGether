@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.letstogether.dto.EventDto;
 import com.letstogether.dto.EventFilterDto;
+import com.letstogether.event.entity.Event;
 import com.letstogether.event.mapper.MapStructMapper;
 import com.letstogether.event.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,15 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/event/v1")
 @RequiredArgsConstructor
 public class EventController {
+
   private final EventService eventService;
   private final MapStructMapper mapper;
+
+  @PostMapping
+  public Mono<EventDto> create(@RequestBody Event event) {
+    return eventService.save(event)
+      .map(mapper::toDto);
+  }
 
   @GetMapping
   public Flux<EventDto> getEvents() {
@@ -38,7 +46,8 @@ public class EventController {
   }
 
   @PostMapping("/byuser/{userId}")
-  public Flux<EventDto> getEventsByUserId(@RequestHeader("X-USER-ID") Long ownUserId, @PathVariable(required = false) Long userId) {
+  public Flux<EventDto> getEventsByUserId(@RequestHeader("X-USER-ID") Long ownUserId,
+                                          @PathVariable(required = false) Long userId) {
     return eventService.getUsersEventsByUserId(userId == null ? ownUserId : userId)
       .map(mapper::toDto);
   }
