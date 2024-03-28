@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/authontication.main.iml" filepath="$PROJECT_DIR$/.idea/modules/authontication.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/dto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/dto.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event.main.iml" filepath="$PROJECT_DIR$/.idea/modules/event.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/letsToGether.iml" filepath="$PROJECT_DIR$/.idea/letsToGether.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/message-source-starter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/message-source-starter.main.iml" />

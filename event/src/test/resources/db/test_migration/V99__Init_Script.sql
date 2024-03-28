@@ -1,0 +1,33 @@
+-- INSERT INTO event (
+--     status,
+--     start_date,
+--     end_date,
+--     created_at,
+--     description,
+--     address,
+--     lng,
+--     lat,
+--     creator_id,
+--     min_participant,
+--     max_participant,
+--     activity_type
+-- ) VALUES
+--     ('IN_PROGRESS', '2024-06-23 16:30:00', '2024-06-23 18:30:00', NOW(), 'This is a test event description.', '123 Test Street, Test City', 123456789, 987654321, 1, 5, 20, 'FOOTBALL'),
+--     ('COMPLETED', '2024-01-20 14:00:00', '2024-03-20 16:00:00', '2024-01-20 14:00:00', 'Completed event description.', '456 Test Avenue, Test City', 987654321, 123456789, 2, 10, 50, 'RESTAURANT'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2025-02-02 09:00:00', '2025-09-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE'),
+--     ('PLANNING', '2024-07-04 09:00:00', '2024-07-04 12:00:00', NOW(), 'Future event description.', '789 Test Lane, Test City', 234567891, 987654322, 3, 2, 30, 'LECTURE');
+--
+-- INSERT INTO event_to_user
+--     (event_id, user_id, subscribed)
+-- VALUES
+--     (1, 1, true),
+--     (1, 2, true),
+--     (1, 3, true),
+--     (2, 1, true),
+--     (3, 1, true);

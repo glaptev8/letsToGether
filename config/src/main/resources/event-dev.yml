@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: authentication
+  r2dbc:
+    url: r2dbc:pool:postgres://localhost:5432/event
+  flyway:
+    url: jdbc:postgresql://localhost:5432/event
+server:
+  port: 8082
