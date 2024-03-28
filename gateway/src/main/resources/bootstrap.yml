@@ -1,8 +1,6 @@
 spring:
   config:
     import: "configserver:"
-  application:
-    name: gateway
   cloud:
     config:
       enabled: true
