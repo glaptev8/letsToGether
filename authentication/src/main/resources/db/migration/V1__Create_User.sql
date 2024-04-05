@@ -7,6 +7,7 @@ create table if not exists public.users
     last_name  varchar(128) not null,
     password varchar(2048) not null,
     age        integer      not null,
+    about_me  varchar(256) not null,
     path_to_avatar varchar(4096),
     gender     varchar(32),
     email      varchar(128),

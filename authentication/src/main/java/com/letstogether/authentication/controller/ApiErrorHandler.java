@@ -10,9 +10,10 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.letstogether.authentication.exception.UnauthorizedException;
-import com.letstogether.authentication.exception.UserExistsException;
 import com.letstogether.dto.ErrorResponse;
+import com.letstogether.exception.AuthException;
+import com.letstogether.exception.UnauthorizedException;
+import com.letstogether.exception.UserExistsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,11 @@ public class ApiErrorHandler implements ErrorWebExceptionHandler {
       response.setStatusCode(HttpStatus.BAD_REQUEST);
       log.info(e.getMessage());
       return wrapTransactionResponse(response, e.getCode(), e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    if (ex instanceof AuthException e) {
+      response.setStatusCode(HttpStatus.UNAUTHORIZED);
+      log.info(e.getMessage());
+      return wrapTransactionResponse(response, e.getCode(), e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
     if (ex instanceof UnauthorizedException e) {
       response.setStatusCode(HttpStatus.UNAUTHORIZED);

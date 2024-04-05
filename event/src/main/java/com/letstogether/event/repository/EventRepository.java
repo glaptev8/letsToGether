@@ -13,10 +13,12 @@ public interface EventRepository extends R2dbcRepository<Event, Long> {
 
   @Query("""
           SELECT e.* from event e
-            left join event_to_user eu on e.id = eu.event_id
-          where eu.user_id = :userId
+            left join event_to_user eu on e.id = eu.event_id and eu.subscribed = true
+          where eu.user_id = :userId and e.status != 'CANCELED'
   """)
   Flux<Event> findAllUsersEventByUserId(Long userId);
+
+  Flux<Event> findAllByCreatorIdNotAndStatus(Long creatorId, EventStatus status);
 
   Mono<Boolean> existsByIdAndStatus(Long id, EventStatus eventStatus);
 }

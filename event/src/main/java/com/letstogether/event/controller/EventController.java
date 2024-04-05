@@ -1,16 +1,21 @@
 package com.letstogether.event.controller;
 
+import org.bouncycastle.pqc.crypto.newhope.NHSecretKeyProcessor.PartyUBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.letstogether.dto.EventDto;
 import com.letstogether.dto.EventFilterDto;
+import com.letstogether.dto.EventStatus;
+import com.letstogether.dto.UpdateStatusRequestDto;
 import com.letstogether.event.entity.Event;
+import com.letstogether.event.entity.EventToUser;
 import com.letstogether.event.mapper.MapStructMapper;
 import com.letstogether.event.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +33,15 @@ public class EventController {
   private final MapStructMapper mapper;
 
   @PostMapping
-  public Mono<EventDto> create(@RequestBody Event event) {
+  public Mono<EventDto> create(@RequestBody Event event, @RequestHeader("X-USER-ID") Long userId) {
+    event.setCreatorId(userId);
     return eventService.save(event)
       .map(mapper::toDto);
   }
 
   @GetMapping
-  public Flux<EventDto> getEvents() {
-    return eventService.getAll()
+  public Flux<EventDto> getEvents(@RequestHeader("X-USER-ID") Long userId) {
+    return eventService.getAll(userId)
       .map(mapper::toDto);
   }
 
@@ -45,22 +51,48 @@ public class EventController {
       .map(mapper::toDto);
   }
 
-  @PostMapping("/byuser/{userId}")
+  @PostMapping("/subscribe")
+  public Mono<Boolean> subscribe(@RequestHeader("X-USER-ID") Long userId,
+                                 @RequestParam(name = "eventId") Long eventId) {
+    return eventService.subscribe(userId, eventId);
+  }
+
+  @PostMapping("/unsubscribe")
+  public Mono<Boolean> unsubscribe(@RequestHeader("X-USER-ID") Long userId,
+                                 @RequestParam(name = "eventId") Long eventId) {
+    return eventService.unsubscribe(eventId, userId);
+  }
+
+  @PostMapping("/byuser")
   public Flux<EventDto> getEventsByUserId(@RequestHeader("X-USER-ID") Long ownUserId,
-                                          @PathVariable(required = false) Long userId) {
+                                          @RequestParam(name = "eventId", required = false) Long userId) {
     return eventService.getUsersEventsByUserId(userId == null ? ownUserId : userId)
       .map(mapper::toDto);
   }
 
-  @GetMapping("/users")
-  public Flux<EventDto> getUsers(@RequestHeader("X-USER-ID") Long userId) {
-    return eventService.getByUserId(userId)
+  @GetMapping("/bycreator")
+  public Flux<EventDto> getEventsByCreator(@RequestHeader("X-USER-ID") Long ownUserId,
+                                           @RequestParam(name = "userId", required = false) Long userId) {
+    return eventService.getEventsByCreator(userId == null ? ownUserId : userId)
       .map(mapper::toDto);
   }
 
+  @GetMapping("/users/event/{eventId}")
+  public Flux<EventToUser> getUsersByEvent(@PathVariable Long eventId) {
+    return eventService.getUsersByEvent(eventId);
+  }
+
   @PostMapping("/byfilter")
-  public Flux<EventDto> postEvent(@RequestBody EventFilterDto filter) {
-    return eventService.getEventsByFilter(filter)
+  public Flux<EventDto> byFilter(@RequestBody EventFilterDto filter, @RequestHeader("X-USER-ID") Long userId) {
+    return eventService.getEventsByFilter(filter, userId)
+      .map(mapper::toDto);
+  }
+
+  @PostMapping("/cancel")
+  public Mono<EventDto> cancel(@RequestHeader("X-USER-ID") Long userId,
+                               @RequestBody UpdateStatusRequestDto updateStatusRequestDto) {
+    return eventService
+      .updateStatus(updateStatusRequestDto.getEventId(), userId, updateStatusRequestDto.getEventStatus())
       .map(mapper::toDto);
   }
 }

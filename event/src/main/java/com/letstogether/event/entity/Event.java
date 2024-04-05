@@ -1,5 +1,6 @@
 package com.letstogether.event.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -29,8 +30,9 @@ public class Event {
   private ActivityType activityType;
   private String description;
   private String address;
-  private Long lng;
-  private Long lat;
+  private String name;
+  private BigDecimal lng;
+  private BigDecimal lat;
   private Long creatorId;
   private Integer minParticipant;
   private Integer maxParticipant;

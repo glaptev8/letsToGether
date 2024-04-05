@@ -18,7 +18,7 @@
 //import com.letstogether.authentication.config.TestContainerConfig;
 //import com.letstogether.authentication.config.TestEnvironmentConfig;
 //import com.letstogether.authentication.entity.User;
-//import com.letstogether.authentication.exception.AuthException;
+//import com.letstogether.exception.AuthException;
 //import com.letstogether.authentication.util.JsonReader;
 //import reactor.core.publisher.Mono;
 //import reactor.test.StepVerifier;

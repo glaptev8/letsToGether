@@ -4,8 +4,8 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.letstogether.authentication.exception.UnauthorizedException;
 import com.letstogether.authentication.repository.UserRepository;
+import com.letstogether.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 

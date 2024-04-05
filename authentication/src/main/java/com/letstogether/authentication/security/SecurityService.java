@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.letstogether.authentication.entity.User;
-import com.letstogether.authentication.exception.AuthException;
 import com.letstogether.authentication.repository.UserRepository;
+import com.letstogether.exception.AuthException;
 import com.letstogether.messagesourcestarter.service.MessageSourceService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -54,12 +54,12 @@ public class SecurityService {
       .findByEmail(email)
       .flatMap(user -> {
         if (!passwordEncoder.matches(password, user.getPassword())) {
-          return Mono.error(new AuthException(messageSourceService.logMessage("invalid.password.message"),
-                                              messageSourceService.logMessage("invalid.password.code")));
+          return Mono.error(new AuthException(messageSourceService.logMessage("invalid.password.code"),
+                                              messageSourceService.logMessage("invalid.password.message")));
         }
         return Mono.just(generateToken(user));
       })
-      .switchIfEmpty(Mono.error(new AuthException(messageSourceService.logMessage("user.not.found.message"),
-                                                  messageSourceService.logMessage("user.not.found.code"))));
+      .switchIfEmpty(Mono.error(new AuthException(messageSourceService.logMessage("user.not.found.code"),
+                                                  messageSourceService.logMessage("user.not.found.message"))));
   }
 }

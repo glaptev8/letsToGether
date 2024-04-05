@@ -3,7 +3,7 @@ package com.letstogether.authentication.security;
 import java.util.Base64;
 import java.util.Date;
 
-import com.letstogether.authentication.exception.UnauthorizedException;
+import com.letstogether.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group = 'com.letstogether'
+version = '1.13-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "http://localhost:8090/repository/maven-snapshots"
+            credentials {
+                username = "admin"
+                password = "Hyper1990!"
+            }
+            allowInsecureProtocol true
+        }
+    }
+}
+
+dependencies {
+    implementation "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}

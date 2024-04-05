@@ -4,5 +4,5 @@ public enum EventStatus {
   COMPLETED,
   IN_PROGRESS,
   PLANNING,
-  CLOSED
+  CANCELED
 }

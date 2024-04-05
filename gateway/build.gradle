@@ -13,6 +13,14 @@ java {
 
 repositories {
   mavenCentral()
+  maven {
+    url = 'http://localhost:8090/repository/maven-snapshots'
+    credentials {
+      username = "admin"
+      password = "Hyper1990!"
+    }
+    allowInsecureProtocol true
+  }
 }
 
 dependencies {
@@ -24,6 +32,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 //  implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+  implementation "com.letstogether:dto:$dto"
 
   compileOnly 'org.projectlombok:lombok'
   annotationProcessor 'org.projectlombok:lombok'

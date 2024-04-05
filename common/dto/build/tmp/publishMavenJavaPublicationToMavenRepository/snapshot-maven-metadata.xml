@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.letstogether</groupId>
+  <artifactId>dto</artifactId>
+  <versioning>
+    <lastUpdated>20240405160427</lastUpdated>
+    <snapshot>
+      <timestamp>20240405.160427</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>module</extension>
+        <value>1.13-20240405.160427-1</value>
+        <updated>20240405160427</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.13-20240405.160427-1</value>
+        <updated>20240405160427</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.13-20240405.160427-1</value>
+        <updated>20240405160427</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>1.13-SNAPSHOT</version>
+</metadata>

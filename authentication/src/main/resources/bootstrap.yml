@@ -14,4 +14,4 @@ springdoc:
     path: /auth/swagger-ui.html
 
 upload:
-  path: /Users/glelap/projects/letsToGether/authentication/avatar/
+  path: /Users/glelap/projects/letsToGether/static/

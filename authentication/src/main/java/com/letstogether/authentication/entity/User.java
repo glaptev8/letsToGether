@@ -1,12 +1,15 @@
 package com.letstogether.authentication.entity;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.letstogether.dto.GenderType;
+import com.letstogether.dto.HobbyType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +26,9 @@ public class User {
   private String firstName;
   private String password;
   private String lastName;
+  private String aboutMe;
+  @Transient
+  private Set<HobbyType> hobbies;
   private GenderType gender;
   private Integer age;
   private String pathToAvatar;

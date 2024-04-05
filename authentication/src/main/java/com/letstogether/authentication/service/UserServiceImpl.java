@@ -1,21 +1,24 @@
 package com.letstogether.authentication.service;
 
-import java.io.File;
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.letstogether.authentication.entity.Hobby;
 import com.letstogether.authentication.entity.User;
-import com.letstogether.authentication.exception.UserExistsException;
+import com.letstogether.authentication.repository.HobbyRepository;
 import com.letstogether.authentication.repository.UserRepository;
 import com.letstogether.authentication.security.SecurityService;
 import com.letstogether.authentication.security.TokenDetails;
+import com.letstogether.dto.HobbyType;
+import com.letstogether.exception.UserExistsException;
 import com.letstogether.messagesourcestarter.service.MessageSourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -27,29 +30,17 @@ public class UserServiceImpl implements UserService {
   private final SecurityService securityService;
   private final MessageSourceService messageSourceService;
   private final PasswordEncoder passwordEncoder;
-  @Value("${upload.path}")
-  private String uploadPath;
+  private final ImageServiceImpl imageServiceImpl;
+  private final HobbyRepository hobbyRepository;
 
   @Override
   public Mono<User> saveUser(User user, FilePart avatar) {
-    log.info("saving user {}", user);
-    return savePhoto(avatar)
-      .flatMap(pathToFile -> {
-        user.setPathToAvatar(pathToFile);
-        return Mono.empty();
-      })
-      .then(userRepository.existsByEmailOrPhone(user.getEmail(), user.getPhone())
-              .flatMap(exists -> {
-                if (exists) {
-                  return Mono.error(new UserExistsException(
-                    messageSourceService.logMessage("user.exits.code"),
-                    messageSourceService.logMessage("user.exits.message"))
-                  );
-                }
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-                return userRepository.save(user);
-              })
-              .doOnNext(savedUser -> log.info("user was saved: {}", savedUser)));
+    log.info("Saving user {}", user);
+    return imageServiceImpl.savePhoto(avatar)
+      .doOnNext(user::setPathToAvatar)
+      .then(saveUser(user))
+      .flatMap(this::setUserHobbies)
+      .doOnNext(savedUser -> log.info("user was saved: {}", savedUser));
   }
 
   @Override
@@ -62,17 +53,58 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(user);
   }
 
-  private Mono<String> savePhoto(FilePart avatar) {
-    log.info("saving photo {}", avatar);
-    if (avatar == null) {
-      return Mono.empty();
-    }
-    var pathToFile = new StringBuilder();
-    var newAvatarName = UUID.randomUUID() + "_" + avatar.filename();
-    pathToFile.append(uploadPath).append(newAvatarName);
-    return avatar
-      .transferTo(new File(pathToFile.toString()))
-      .then(Mono.just(newAvatarName))
-      .doOnError(e -> log.info("saving file error {0}", e));
+  @Override
+  public Mono<User> getUserById(Long userId) {
+    return userRepository.findById(userId)
+      .flatMap(user -> hobbyRepository.findHobbyByUserId(userId)
+        .map(HobbyType::valueOf)
+        .collect(Collectors.toSet())
+        .doOnNext(user::setHobbies)
+        .then(Mono.just(user)))
+      .switchIfEmpty(Mono.error(new RuntimeException("User not found"))); // TODO: 2024-03-31 UserNotFoundException
+  }
+
+  @Override
+  public Flux<User> getUsersById(List<Long> userIds) {
+    return userRepository.findAllById(userIds)
+      .flatMap(user -> hobbyRepository.findHobbyByUserId(user.getId())
+        .map(HobbyType::valueOf)
+        .collect(Collectors.toSet())
+        .doOnNext(user::setHobbies)
+        .then(Mono.just(user)));
+  }
+
+  @Override
+  public Flux<User> getUsersAvatar(List<Long> userIds) {
+    return userRepository.findAvatarsByUsersId(userIds);
+  }
+
+  @Override
+  public Mono<User> getUserAvatar(Long userId) {
+    return userRepository.findAvatarByUserId(userId);
+  }
+
+  private Mono<User> saveUser(User user) {
+    return userRepository.existsByEmailOrPhone(user.getEmail(), user.getPhone())
+      .flatMap(exists -> {
+        if (exists) {
+          return Mono.error(new UserExistsException(
+            messageSourceService.logMessage("user.exits.code"),
+            messageSourceService.logMessage("user.exits.message")));
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+      });
+  }
+
+  private Mono<User> setUserHobbies(User user) {
+    user.setHobbies(user.getHobbies());
+    return Flux.fromIterable(user.getHobbies())
+      .flatMap(hobby -> hobbyRepository.save(Hobby.builder()
+                                               .userId(user.getId())
+                                               .hobby(hobby)
+                                               .build()))
+      .collectList()
+      .thenReturn(user);
   }
 }

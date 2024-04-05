@@ -2,6 +2,7 @@ package com.letstogether.event.service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -17,6 +18,7 @@ import com.letstogether.event.entity.Event;
 import com.letstogether.event.entity.EventToUser;
 import com.letstogether.event.repository.EventRepository;
 import com.letstogether.event.repository.EventToUserRepository;
+import com.letstogether.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -35,9 +37,10 @@ public class EventServiceImpl implements EventService {
   @Override
   public Mono<Event> save(Event event) {
     log.info("save event: {}", event);
-    if (event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate())) {
-      return Mono.error(new RuntimeException("End date is before start date")); // TODO: 2024-03-27 EventException
+    if ((event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate()) || event.getStartDate().isBefore(LocalDateTime.now().plusHours(3)))) {
+      return Mono.error(new ApiException("EVENT_ERROR","End date is before start date or in the past")); // TODO: 2024-03-27 EventException
     }
+    event.setStatus(EventStatus.PLANNING);
     return transactionalOperator.transactional(
       eventRepository
         .save(event)
@@ -56,24 +59,32 @@ public class EventServiceImpl implements EventService {
   @Override
   public Mono<Boolean> subscribe(Long userId, Long eventId) {
     log.info("subscribe userid {} to event: {}", userId, eventId);
-    return eventRepository.existsByIdAndStatus(eventId, EventStatus.PLANNING)
-      .flatMap(exists -> {
-        if (exists) {
-          return eventToUserRepository.existsByEventIdAndUserId(eventId, userId)
-            .flatMap(existsByEventIdAndUserId -> {
-              if (existsByEventIdAndUserId) {
-                return Mono.error(new RuntimeException("user already subscribed")); // TODO: 2024-03-27 UserAlreadySubscribed
-              }
-              return eventToUserRepository.save(EventToUser.builder()
-                                                  .eventId(eventId)
-                                                  .userId(userId)
-                                                  .subscribed(true)
-                                                  .build())
-                .doOnSuccess(savedEvent -> log.info("userid was {} subscribed event: {}", userId, savedEvent))
-                .thenReturn(true);
-            });
+    return eventRepository.findById(eventId)
+      .flatMap(event -> {
+        if (!event.getStatus().equals(EventStatus.PLANNING)) {
+          return Mono.error(new RuntimeException("Event is not planning"));
         }
-        return Mono.error(new RuntimeException("event not found or already completed")); // TODO: 2024-03-26 EventUnSubscribeException
+        return eventToUserRepository.countByEventIdAndSubscribed(eventId, true)
+          .flatMap(count -> {
+            if (event.getMaxParticipant() != null && count >= event.getMaxParticipant()) {
+              return Mono.error(new RuntimeException("max participant reached")); // TODO: 2024-03-30 EventMaxParticipantReachedException
+            }
+            return eventToUserRepository.findByEventIdAndUserId(eventId, userId)
+              .flatMap(userByEventIdAndUserId -> {
+                if (userByEventIdAndUserId.getSubscribed()) {
+                  return Mono.error(new RuntimeException("user already subscribed")); // TODO: 2024-03-27 UserAlreadySubscribed
+                }
+                userByEventIdAndUserId.setSubscribed(true);
+                return eventToUserRepository.save(userByEventIdAndUserId)
+                  .doOnSuccess(savedEvent -> log.info("userid was {} subscribed event: {}", userId, savedEvent))
+                  .thenReturn(true);
+              })
+              .switchIfEmpty(eventToUserRepository.save(EventToUser.builder()
+                                                          .eventId(eventId)
+                                                          .userId(userId)
+                                                          .subscribed(true)
+                                                          .build()).thenReturn(true));
+          });
       });
   }
 
@@ -101,16 +112,14 @@ public class EventServiceImpl implements EventService {
   }
 
   @Override
-  public Flux<Event> getAll() {
-    var filter = EventFilterDto.builder()
-      .eventStatus(EventStatus.PLANNING)
-      .build();
-
-    return getEventsByFilter(filter);
+  public Flux<Event> getAll(Long creatorId) {
+    return eventRepository
+      .findAllByCreatorIdNotAndStatus(creatorId, EventStatus.PLANNING)
+      .doOnNext(event -> log.info("getAll event: {}", event));
   }
 
   @Override
-  public Flux<Event> getByUserId(Long userId) {
+  public Flux<Event> getEventsByCreator(Long userId) {
     log.info("get all events by creator {}", userId);
     return eventRepository.findAllByCreatorId(userId);
   }
@@ -129,7 +138,7 @@ public class EventServiceImpl implements EventService {
   }
 
   @Override
-  public Mono<Event> updateStatus(Long eventId, EventStatus newEventStatus) {
+  public Mono<Event> updateStatus(Long eventId, Long userId, EventStatus newEventStatus) {
     log.info("update status for event {} to status {}", eventId, newEventStatus);
     return eventRepository
       .findById(eventId)
@@ -137,6 +146,9 @@ public class EventServiceImpl implements EventService {
       .flatMap(event -> {
         if (event.getStatus().equals(EventStatus.COMPLETED)) {
           return Mono.error(new RuntimeException("Event is already completed")); // TODO: 2024-03-26 EventException
+        }
+        if (!Objects.equals(event.getCreatorId(), userId)) {
+          return Mono.error(new RuntimeException("you can not delete this event"));
         }
         event.setStatus(newEventStatus);
         return eventRepository
@@ -147,19 +159,29 @@ public class EventServiceImpl implements EventService {
   }
 
   @Override
-  public Flux<Event> getEventsByFilter(EventFilterDto filter) {
+  public Flux<Event> getEventsByFilter(EventFilterDto filter, Long userId) {
     log.info("looking for events by filter: {}", filter);
-    return entityTemplate
-      .select(Event.class)
-      .matching(getQueryByFilter(filter))
-      .all()
-      .sort(Comparator.comparing(Event::getStartDate))
-      .doOnError(e -> log.error("error finding events", e));
+    return eventToUserRepository.findAllByUserIdAndSubscribed(userId)
+      .collectList()
+      .flatMapMany(ids -> {
+        return entityTemplate
+          .select(Event.class)
+          .matching(getQueryByFilter(filter, ids))
+          .all()
+          .sort(Comparator.comparing(Event::getStartDate))
+          .doOnError(e -> log.error("error finding events", e));
+      });
   }
 
-  private Query getQueryByFilter(EventFilterDto filter) {
+  @Override
+  public Flux<EventToUser> getUsersByEvent(Long eventId) {
+    return eventToUserRepository.findAllByEventIdAndSubscribed(eventId, Boolean.TRUE);
+  }
+
+  private Query getQueryByFilter(EventFilterDto filter, List<Long> ids) {
+    System.out.println(ids);
     var query = Query.query(Criteria
-                              .from(criteria(filter)));
+                              .from(criteria(filter).and("id").notIn(ids)));
     if (filter.getOffset() != null && filter.getLimit() != null) {
       query = query
         .offset((long) filter.getOffset())

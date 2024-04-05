@@ -162,7 +162,7 @@ class EventServiceImplTest extends TestContainerConfig {
 
     StepVerifier.create(
         eventService.save(event)
-          .flatMap(savedEvent -> eventService.updateStatus(event.getId(), EventStatus.COMPLETED)
+          .flatMap(savedEvent -> eventService.updateStatus(event.getId(), event.getCreatorId(), EventStatus.COMPLETED)
             .then(eventService.getEvent(event.getId()))))
       .expectNextMatches(updatedEvent -> updatedEvent.getStatus().equals(EventStatus.COMPLETED))
       .verifyComplete();
@@ -175,7 +175,7 @@ class EventServiceImplTest extends TestContainerConfig {
 
     StepVerifier.create(
         eventService.save(event)
-          .flatMap(savedEvent -> eventService.updateStatus(event.getId(), EventStatus.COMPLETED)))
+          .flatMap(savedEvent -> eventService.updateStatus(event.getId(), event.getCreatorId(), EventStatus.COMPLETED)))
       .expectError(RuntimeException.class)
       .verify();
   }
@@ -196,7 +196,7 @@ class EventServiceImplTest extends TestContainerConfig {
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
           .flatMap(e -> eventService.save(e))
-          .thenMany(eventService.getEventsByFilter(eventFilter))
+          .thenMany(eventService.getEventsByFilter(eventFilter, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
@@ -232,7 +232,7 @@ class EventServiceImplTest extends TestContainerConfig {
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
           .flatMap(e -> eventService.save(e))
-          .thenMany(eventService.getEventsByFilter(eventFilter))
+          .thenMany(eventService.getEventsByFilter(eventFilter, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
@@ -243,7 +243,7 @@ class EventServiceImplTest extends TestContainerConfig {
 
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
-          .thenMany(eventService.getEventsByFilter(eventFilter2))
+          .thenMany(eventService.getEventsByFilter(eventFilter2, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
@@ -277,7 +277,7 @@ class EventServiceImplTest extends TestContainerConfig {
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
           .flatMap(e -> eventService.save(e))
-          .thenMany(eventService.getEventsByFilter(eventFilter))
+          .thenMany(eventService.getEventsByFilter(eventFilter, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
@@ -306,7 +306,7 @@ class EventServiceImplTest extends TestContainerConfig {
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
           .flatMap(e -> eventService.save(e))
-          .thenMany(eventService.getEventsByFilter(eventFilter))
+          .thenMany(eventService.getEventsByFilter(eventFilter, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
@@ -334,12 +334,34 @@ class EventServiceImplTest extends TestContainerConfig {
     StepVerifier.create(
         Flux.fromIterable(List.of(event, event2, event3, event4))
           .flatMap(e -> eventService.save(e))
-          .thenMany(eventService.getEventsByFilter(eventFilter))
+          .thenMany(eventService.getEventsByFilter(eventFilter, 10L))
           .collectList()
       )
       .consumeNextWith(eventsByFilter -> {
         assertEquals(3, eventsByFilter.size());
         assertTrue(eventsByFilter.stream().allMatch(e -> ActivityType.groupedActivity.get(activityGroupFilter).contains(e.getActivityType())));
+      })
+      .verifyComplete();
+  }
+
+  @Test
+  void getAll() {
+    var event = JsonReader.read("json/event.json", Event.class);
+    var event2 = JsonReader.read("json/event.json", Event.class);
+    var event3 = JsonReader.read("json/event.json", Event.class);
+    var event4 = JsonReader.read("json/event.json", Event.class);
+    event.setStatus(EventStatus.COMPLETED);
+    event2.setCreatorId(2L);
+
+    StepVerifier.create(
+        Flux.fromIterable(List.of(event, event2, event3, event4))
+          .flatMap(e -> eventService.save(e))
+          .thenMany(eventService.getAll(event.getCreatorId()))
+          .collectList()
+      )
+      .consumeNextWith(events -> {
+        assertEquals(1, events.size());
+        assertTrue(events.stream().allMatch(e -> e.getStatus().equals(EventStatus.PLANNING)));
       })
       .verifyComplete();
   }
