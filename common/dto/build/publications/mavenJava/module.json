@@ -3,7 +3,7 @@
   "component": {
     "group": "com.letstogether",
     "module": "dto",
-    "version": "1.13-SNAPSHOT",
+    "version": "1.14-SNAPSHOT",
     "attributes": {
       "org.gradle.status": "integration"
     }
@@ -25,13 +25,13 @@
       },
       "files": [
         {
-          "name": "dto-1.13-SNAPSHOT.jar",
-          "url": "dto-1.13-SNAPSHOT.jar",
-          "size": 21517,
-          "sha512": "5f8a9308e3c1c41b14a7796d5c3d0a9e52bbdc482106ddc9e8eee5aaea3ebacc3e0a727f8d213e5f1561a27812645b25a6193d319cb67b2af54f5c9c83bc185d",
-          "sha256": "8455f9416e22ea790671a44c6946455e386d006b66237bc05858c2c5a218a4c0",
-          "sha1": "14c4fa5dcddceec06d2097bc8291a3b6d0c0ba0c",
-          "md5": "f73e9afde3a05f2438e17d8e863cf839"
+          "name": "dto-1.14-SNAPSHOT.jar",
+          "url": "dto-1.14-SNAPSHOT.jar",
+          "size": 24652,
+          "sha512": "6b5477bef29a1b74d1b8aec1913c39997bf42e4b9338ddd6167cf183e31d69a6fc4bc232cdc149014dbd1c1c4c894053405aece41b597cff9a5ff46c0c550e0a",
+          "sha256": "b59e21569e8b6b2bb6455998c58f60062250973380f280222e6a70cd0c42c77e",
+          "sha1": "ae6e3e65d02636904d409fa3fa98d1ac85f2aeb2",
+          "md5": "97b9b36a8d94efb4e6ed8a6bc30c4e35"
         }
       ]
     },
@@ -55,13 +55,13 @@
       ],
       "files": [
         {
-          "name": "dto-1.13-SNAPSHOT.jar",
-          "url": "dto-1.13-SNAPSHOT.jar",
-          "size": 21517,
-          "sha512": "5f8a9308e3c1c41b14a7796d5c3d0a9e52bbdc482106ddc9e8eee5aaea3ebacc3e0a727f8d213e5f1561a27812645b25a6193d319cb67b2af54f5c9c83bc185d",
-          "sha256": "8455f9416e22ea790671a44c6946455e386d006b66237bc05858c2c5a218a4c0",
-          "sha1": "14c4fa5dcddceec06d2097bc8291a3b6d0c0ba0c",
-          "md5": "f73e9afde3a05f2438e17d8e863cf839"
+          "name": "dto-1.14-SNAPSHOT.jar",
+          "url": "dto-1.14-SNAPSHOT.jar",
+          "size": 24652,
+          "sha512": "6b5477bef29a1b74d1b8aec1913c39997bf42e4b9338ddd6167cf183e31d69a6fc4bc232cdc149014dbd1c1c4c894053405aece41b597cff9a5ff46c0c550e0a",
+          "sha256": "b59e21569e8b6b2bb6455998c58f60062250973380f280222e6a70cd0c42c77e",
+          "sha1": "ae6e3e65d02636904d409fa3fa98d1ac85f2aeb2",
+          "md5": "97b9b36a8d94efb4e6ed8a6bc30c4e35"
         }
       ]
     }

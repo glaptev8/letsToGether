@@ -1,4 +1,4 @@
-package org.letstogether.chat;
+package com.letstogether.chat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

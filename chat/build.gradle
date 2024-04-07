@@ -1,7 +1,7 @@
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '3.2.4'
-  id 'io.spring.dependency-management' version '1.1.4'
+  id 'org.springframework.boot' version "$springframework"
+  id 'io.spring.dependency-management' version "$dependencymanagement"
 }
 
 group = 'org.letstogether'
@@ -13,9 +13,38 @@ java {
 
 repositories {
   mavenCentral()
+  maven {
+    url = 'http://localhost:8090/repository/maven-snapshots'
+    credentials {
+      username = "admin"
+      password = "Hyper1990!"
+    }
+    allowInsecureProtocol true
+  }
 }
 
 dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+//  implementation 'org.springframework.cloud:spring-cloud-starter-config'
+//  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+  implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+  implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+  implementation 'io.lettuce:lettuce-core'
+
+  implementation "com.letstogether:dto:$dto"
+  implementation "com.letstogether:message-source-starter:$messagesource"
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+  compileOnly "org.mapstruct:mapstruct:$mapStructVersion"
+
+  implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:$openapi"
+
+
   implementation 'org.springframework.boot:spring-boot-starter'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

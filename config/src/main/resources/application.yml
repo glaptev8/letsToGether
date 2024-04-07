@@ -3,7 +3,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/glaptev8/letsToGether
+          uri: https://glaptev8:Andreytrener1@github.com/glaptev8/letsToGether
           searchPaths: config/src/main/resources
           clone-on-start: true
           force-pull: true
