@@ -25,12 +25,12 @@ repositories {
 
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
-//  implementation 'org.springframework.cloud:spring-cloud-starter-config'
-//  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+  implementation 'org.springframework.cloud:spring-cloud-starter-config'
+  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'io.micrometer:micrometer-tracing-bridge-brave'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
-//  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
   implementation 'io.lettuce:lettuce-core'
 
@@ -47,6 +47,12 @@ dependencies {
 
   implementation 'org.springframework.boot:spring-boot-starter'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
 }
 
 tasks.named('test') {

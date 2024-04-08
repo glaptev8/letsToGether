@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
 
 import com.letstogether.dto.ActivityType;
+import com.letstogether.dto.AddUserRequestDto;
 import com.letstogether.dto.EventFilterDto;
 import com.letstogether.dto.EventStatus;
+import com.letstogether.event.client.ChatClient;
 import com.letstogether.event.entity.Event;
 import com.letstogether.event.entity.EventToUser;
 import com.letstogether.event.repository.EventRepository;
@@ -32,13 +34,14 @@ public class EventServiceImpl implements EventService {
   private final EventRepository eventRepository;
   private final EventToUserRepository eventToUserRepository;
   private final TransactionalOperator transactionalOperator;
+  private final ChatClient chatClient;
   private final R2dbcEntityTemplate entityTemplate;
 
   @Override
   public Mono<Event> save(Event event) {
     log.info("save event: {}", event);
     if ((event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate()) || event.getStartDate().isBefore(LocalDateTime.now().plusHours(3)))) {
-      return Mono.error(new ApiException("EVENT_ERROR","End date is before start date or in the past")); // TODO: 2024-03-27 EventException
+      return Mono.error(new ApiException("EVENT_ERROR", "End date is before start date or in the past")); // TODO: 2024-03-27 EventException
     }
     event.setStatus(EventStatus.PLANNING);
     return transactionalOperator.transactional(
@@ -51,6 +54,7 @@ public class EventServiceImpl implements EventService {
                              .subscribed(true)
                              .userId(event.getCreatorId())
                              .build())
+                     .then(chatClient.addUserToChat(new AddUserRequestDto(savedEvent.getCreatorId(), savedEvent.getId())))
                      .thenReturn(savedEvent))
         .doOnSuccess(savedEvent -> log.info("saved event: {}", savedEvent))
     );
@@ -58,35 +62,68 @@ public class EventServiceImpl implements EventService {
 
   @Override
   public Mono<Boolean> subscribe(Long userId, Long eventId) {
-    log.info("subscribe userid {} to event: {}", userId, eventId);
     return eventRepository.findById(eventId)
-      .flatMap(event -> {
-        if (!event.getStatus().equals(EventStatus.PLANNING)) {
-          return Mono.error(new RuntimeException("Event is not planning"));
+      .flatMap(this::validateEventForSubscription)
+      .flatMap(event -> validateMaxParticipants(eventId, event.getMaxParticipant())
+        .thenReturn(event))
+      .flatMap(event -> addUserToEventAndChat(userId, eventId));
+  }
+
+  private Mono<Event> validateEventForSubscription(Event event) {
+    if (!event.getStatus().equals(EventStatus.PLANNING)) {
+      // TODO: Replace with EventNotPlanningException
+      return Mono.error(new RuntimeException("Event is not planning"));
+    }
+    return Mono.just(event);
+  }
+
+  private Mono<Boolean> validateMaxParticipants(Long eventId, Integer maxParticipants) {
+    return eventToUserRepository.countByEventIdAndSubscribed(eventId, true)
+      .flatMap(count -> {
+        if (maxParticipants != null && count >= maxParticipants) {
+          // TODO: Replace with MaxParticipantsReachedException
+          return Mono.error(new RuntimeException("Max participants reached"));
         }
-        return eventToUserRepository.countByEventIdAndSubscribed(eventId, true)
-          .flatMap(count -> {
-            if (event.getMaxParticipant() != null && count >= event.getMaxParticipant()) {
-              return Mono.error(new RuntimeException("max participant reached")); // TODO: 2024-03-30 EventMaxParticipantReachedException
-            }
-            return eventToUserRepository.findByEventIdAndUserId(eventId, userId)
-              .flatMap(userByEventIdAndUserId -> {
-                if (userByEventIdAndUserId.getSubscribed()) {
-                  return Mono.error(new RuntimeException("user already subscribed")); // TODO: 2024-03-27 UserAlreadySubscribed
-                }
-                userByEventIdAndUserId.setSubscribed(true);
-                return eventToUserRepository.save(userByEventIdAndUserId)
-                  .doOnSuccess(savedEvent -> log.info("userid was {} subscribed event: {}", userId, savedEvent))
-                  .thenReturn(true);
-              })
-              .switchIfEmpty(eventToUserRepository.save(EventToUser.builder()
-                                                          .eventId(eventId)
-                                                          .userId(userId)
-                                                          .subscribed(true)
-                                                          .build()).thenReturn(true));
-          });
+        return Mono.just(true);
       });
   }
+
+  private Mono<Boolean> addUserToEventAndChat(Long userId, Long eventId) {
+    return eventToUserRepository.findByEventIdAndUserId(eventId, userId)
+      .flatMap(userByEventIdAndUserId -> {
+        if (userByEventIdAndUserId.getSubscribed()) {
+          // TODO: Replace with UserAlreadySubscribedException
+          return Mono.error(new RuntimeException("User already subscribed"));
+        }
+        userByEventIdAndUserId.setSubscribed(true);
+        return addUserToChatAndSave(userId, eventId, userByEventIdAndUserId);
+      })
+      .switchIfEmpty(
+        addUserToChatAndSave(userId,
+                             eventId,
+                             EventToUser
+                               .builder()
+                               .eventId(eventId)
+                               .userId(userId)
+                               .subscribed(true)
+                               .build()));
+  }
+
+  private Mono<Boolean> addUserToChatAndSave(Long userId, Long eventId, EventToUser eventToUser) {
+    return chatClient.addUserToChat(new AddUserRequestDto(userId, eventId))
+      .flatMap(addUserToChatResult -> {
+        if (!addUserToChatResult) {
+          // TODO: Replace with ChatAddUserFailedException
+          return Mono.error(new RuntimeException("User was not added to chat"));
+        }
+        return eventToUserRepository.save(eventToUser).thenReturn(true);
+      });
+  }
+
+/*  private Throwable handleSubscriptionErrors(Throwable throwable) {
+    // TODO: Implement logic for transforming exceptions into more specific ones
+    return new RuntimeException("Subscription failed due to an unexpected error", throwable);
+  }*/
 
   @Override
   public Mono<Boolean> unsubscribe(Long eventId, Long userId) {
@@ -102,9 +139,17 @@ public class EventServiceImpl implements EventService {
         return eventToUserRepository.findByEventIdAndUserId(eventId, userId)
           .flatMap(eventToUser -> {
             eventToUser.setSubscribed(false);
-            return eventToUserRepository
-              .save(eventToUser)
-              .doOnSuccess(user -> log.info("unsubscribe userid {} to event: {}", userId, eventToUser));
+            return transactionalOperator.transactional(
+              chatClient.removeUser(new AddUserRequestDto(userId, eventId))
+                .flatMap(removeUserFromChatResult -> {
+                  if (!removeUserFromChatResult) {
+                    return Mono.error(new RuntimeException("user was not deleted from chat"));
+                  }
+                  return eventToUserRepository
+                    .save(eventToUser)
+                    .doOnSuccess(user -> log.info("unsubscribe userid {} to event: {}", userId, eventToUser));
+                })
+            );
           })
           .switchIfEmpty(Mono.error(new RuntimeException("user is not subscribed to this event"))) // TODO: 2024-03-26 EventUnSubscribeException
           .thenReturn(true);

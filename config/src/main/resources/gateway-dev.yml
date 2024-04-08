@@ -14,3 +14,11 @@ spring:
           uri: lb://event
           predicates:
             - Path=/event/**
+        - id: chat
+          uri: lb://chat
+          predicates:
+            - Path=/chat-socket/**
+          filters:
+            - RewritePath=/chat-socket/(?<segment>.*), /$\{segment}
+      websocket:
+        enabled: true

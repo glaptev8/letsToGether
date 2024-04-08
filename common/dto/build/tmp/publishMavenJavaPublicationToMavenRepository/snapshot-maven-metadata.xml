@@ -3,28 +3,28 @@
   <groupId>com.letstogether</groupId>
   <artifactId>dto</artifactId>
   <versioning>
-    <lastUpdated>20240407094903</lastUpdated>
+    <lastUpdated>20240407182018</lastUpdated>
     <snapshot>
-      <timestamp>20240407.094903</timestamp>
+      <timestamp>20240407.182018</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
     <snapshotVersions>
       <snapshotVersion>
+        <extension>module</extension>
+        <value>1.15-20240407.182018-1</value>
+        <updated>20240407182018</updated>
+      </snapshotVersion>
+      <snapshotVersion>
         <extension>jar</extension>
-        <value>1.14-20240407.094903-1</value>
-        <updated>20240407094903</updated>
+        <value>1.15-20240407.182018-1</value>
+        <updated>20240407182018</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>pom</extension>
-        <value>1.14-20240407.094903-1</value>
-        <updated>20240407094903</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>module</extension>
-        <value>1.14-20240407.094903-1</value>
-        <updated>20240407094903</updated>
+        <value>1.15-20240407.182018-1</value>
+        <updated>20240407182018</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.15-SNAPSHOT</version>
 </metadata>

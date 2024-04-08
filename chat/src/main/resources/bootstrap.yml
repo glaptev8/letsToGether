@@ -1,13 +1,3 @@
-#spring:
-#  application:
-#    name: chat
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
-#server:
-#  port: 8084
-
 spring:
   config:
     import: "configserver:"
@@ -18,4 +8,5 @@ spring:
         enabled: true
       name: chat
       profile: dev
-
+server:
+  port: 8084
