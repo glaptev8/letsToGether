@@ -24,3 +24,6 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
             allowCredentials: true
+      global-filter:
+        websocket-routing:
+          enabled: true

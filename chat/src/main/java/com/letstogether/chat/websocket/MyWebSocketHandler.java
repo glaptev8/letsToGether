@@ -2,6 +2,8 @@ package com.letstogether.chat.websocket;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveSetOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MyWebSocketHandler extends TextWebSocketHandler {
 
+  private static final Logger log = LoggerFactory.getLogger(MyWebSocketHandler.class);
   private final ReactiveRedisTemplate<String, String> reactiveMemberRedisTemplate;
   private final MessageService messageService;
 
@@ -27,7 +30,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
   public void afterConnectionEstablished(WebSocketSession session) {
     String chatId = session.getUri().getPath().split("/")[session.getUri().getPath().split("/").length - 1];
     String redisChannel = "chat:" + chatId + ":messages";
-
+    log.info("setting new connection to chatId {}", chatId);
     reactiveMemberRedisTemplate.listenTo(ChannelTopic.of(redisChannel)).doOnNext(message -> {
       try {
         session.sendMessage(new TextMessage(message.getMessage()));
