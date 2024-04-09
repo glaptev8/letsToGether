@@ -26,6 +26,7 @@
           <span class="text-caption">remove</span>
         </v-btn>
       </template>
+      <ChatComponent :subscribed="subscribed" :event="event"/>
     </v-card-actions>
   </v-card>
   <ModalMapComponent :address="event.address" :center="{ lat: event.lat, lng: event.lng }" :zoom="15"
@@ -42,6 +43,7 @@ import DescriptionModalComponent from '@/components/DescriptionModalComponent.vu
 import ParticipantsModalComponent from '@/components/ParticipantsModalComponent.vue';
 import axios from 'axios';
 import { authData } from '@/stores/auth';
+import ChatComponent from '@/components/ChatComponent.vue';
 
 const emit = defineEmits(['eventRemoved', 'showError']);
 
@@ -76,6 +78,36 @@ const loadParticipants = async () => {
       console.log(error)
     }
   }
+}
+
+const token = authData().token
+
+let discussion = async () => {
+  // Указываем адрес сервера WebSocket
+  let ws = new WebSocket(`ws://localhost:8082/chat-socket/2?token=${token}`);
+
+  // Событие, вызываемое при успешном соединении
+  ws.onopen = function(event) {
+    console.log('Connected to the WebSocket server');
+  };
+
+  // Событие, вызываемое при получении сообщения от сервера
+  ws.onmessage = function(event) {
+    console.log('Message from server:', event.data);
+    // Обработка сообщения от сервера
+  };
+
+  // Событие, вызываемое при закрытии соединения
+  ws.onclose = function(event) {
+    console.log('Disconnected from the WebSocket server');
+    // Обработка закрытия соединения
+  };
+
+  // Событие, вызываемое при возникновении ошибки в соединении
+  ws.onerror = function(event) {
+    console.error('WebSocket error:', event);
+    // Обработка ошибки соединения
+  };
 }
 
 let remove = async () => {

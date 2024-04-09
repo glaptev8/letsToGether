@@ -43,8 +43,10 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
   @Override
   protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
     var objectMapper = new ObjectMapper();
+    var messageToChat = objectMapper.readValue(message.getPayload(), Message.class);
+    messageToChat.setUserId(session.getHandshakeHeaders().getFirst("x-user-id"));
     messageService
-      .addMessage(objectMapper.readValue(message.getPayload(), Message.class))
+      .addMessage(messageToChat)
       .subscribe();
   }
 }

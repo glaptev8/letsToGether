@@ -17,7 +17,7 @@ axios.interceptors.request.use((config) => {
   const { token, userId } = authData ? JSON.parse(authData) : {}
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
-    config.headers.set('X-USER-ID', userId)
+    // config.headers.set('X-USER-ID', userId)
   }
   return config;
 }, (error) => {

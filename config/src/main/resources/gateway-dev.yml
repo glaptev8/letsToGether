@@ -16,7 +16,5 @@ spring:
             - Path=/event/**
         - id: chat
           uri: lb://chat
-          predicates:
-            - Path=/chat-socket/**
       websocket:
         enabled: true
