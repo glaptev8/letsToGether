@@ -1,11 +1,12 @@
-package com.letstogether.event.service;
+package com.letstogether.dto;
 
-import com.letstogether.dto.EventStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventStatusMessage {

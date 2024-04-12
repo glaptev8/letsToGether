@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: event-consumer
+  rabbitmq:
+    host: localhost
+    port: 5673
+    username: user
+    password: password
+server:
+  port: 8083

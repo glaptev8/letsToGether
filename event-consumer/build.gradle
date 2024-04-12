@@ -1,0 +1,52 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.2.4'
+  id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'org.letstogether'
+version = '0.0.1-SNAPSHOT'
+
+java {
+  sourceCompatibility = '21'
+}
+
+repositories {
+  mavenCentral()
+  maven {
+    url = 'http://localhost:8090/repository/maven-snapshots'
+    credentials {
+      username = "admin"
+      password = "Hyper1990!"
+    }
+    allowInsecureProtocol true
+  }
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+  implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+  implementation 'org.springframework.cloud:spring-cloud-starter-config'
+  implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+  implementation 'org.springframework.boot:spring-boot-starter-amqp'
+  implementation 'org.springframework.amqp:spring-rabbit'
+
+  implementation "com.letstogether:dto:$dto"
+  implementation "com.letstogether:message-source-starter:$messagesource"
+
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+  compileOnly "org.mapstruct:mapstruct:$mapStructVersion"
+
+  testImplementation "org.testcontainers:junit-jupiter:$jupiter"
+  testImplementation 'io.projectreactor:reactor-test'
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}

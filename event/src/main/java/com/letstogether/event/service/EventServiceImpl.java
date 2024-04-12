@@ -1,12 +1,10 @@
 package com.letstogether.event.service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
@@ -27,9 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import static com.letstogether.dto.EventStatus.IN_PROGRESS;
 import static com.letstogether.dto.EventStatus.PLANNING;
 
 @Slf4j
@@ -42,7 +38,7 @@ public class EventServiceImpl implements EventService {
   private final TransactionalOperator transactionalOperator;
   private final ChatClient chatClient;
   private final R2dbcEntityTemplate entityTemplate;
-  private RabbitTemplate rabbitTemplate;
+  private final RabbitSenderService rabbitSenderService;
 
   @Override
   public Mono<Event> save(Event event) {
@@ -54,33 +50,9 @@ public class EventServiceImpl implements EventService {
     return transactionalOperator.transactional(
       eventRepository
         .save(event)
-        .flatMap(savedEvent ->
-                   eventToUserRepository
-                     .save(EventToUser.builder()
-                             .eventId(savedEvent.getId())
-                             .subscribed(true)
-                             .userId(event.getCreatorId())
-                             .build())
-                     .then(chatClient.addUserToChat(new AddUserRequestDto(savedEvent.getCreatorId(), savedEvent.getId())))
-                     .then(sendDelayedMessage(savedEvent))
-                     .thenReturn(savedEvent))
+        .flatMap(this::doProcessRelatedToSavingEvent)
         .doOnSuccess(savedEvent -> log.info("saved event: {}", savedEvent))
     );
-  }
-
-  private Mono<Void> sendDelayedMessage(Event savedEvent) {
-    long delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), savedEvent.getStartDate());
-    EventStatusMessage message = new EventStatusMessage(savedEvent.getId(), IN_PROGRESS);
-
-    return Mono.fromCallable(() -> {
-      rabbitTemplate.convertAndSend("delayed_exchange", "event_status_routing_key", message, msg -> {
-        msg.getMessageProperties().setDelayLong(delay);
-        return msg;
-      });
-      return null;
-    })
-      .subscribeOn(Schedulers.boundedElastic())
-      .then();
   }
 
   @Override
@@ -259,6 +231,23 @@ public class EventServiceImpl implements EventService {
     }
 
     return query;
+  }
+
+  private Mono<Event> doProcessRelatedToSavingEvent(Event savedEvent) {
+    return eventToUserRepository
+      .save(toEventToUser(savedEvent))
+      .then(chatClient.addUserToChat(new AddUserRequestDto(savedEvent.getCreatorId(), savedEvent.getId())))
+      .then(rabbitSenderService.sendDelayedMessageChangeStatusToInProgress(savedEvent))
+      .then(rabbitSenderService.sendDelayedMessageChangeStatusToCompleted(savedEvent))
+      .thenReturn(savedEvent);
+  }
+
+  private EventToUser toEventToUser(Event savedEvent) {
+    return EventToUser.builder()
+      .eventId(savedEvent.getId())
+      .subscribed(true)
+      .userId(savedEvent.getCreatorId())
+      .build();
   }
 
   private Criteria criteria(EventFilterDto eventFilterDto) {
