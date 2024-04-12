@@ -1,6 +1,9 @@
 package com.letstogether.chat.config;
 
+import com.letstogether.chat.client.EventClient;
 import com.letstogether.chat.entity.Message;
+
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -13,6 +16,9 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
 public class ChatConfig {
@@ -57,5 +63,21 @@ public class ChatConfig {
     RedisMessageListenerContainer container = new RedisMessageListenerContainer();
     container.setConnectionFactory(connectionFactory);
     return container;
+  }
+
+  @Bean
+  WebClient webClientForChar(ReactorLoadBalancerExchangeFilterFunction lbFunction) {
+    return WebClient.builder()
+      .baseUrl("http://event/")
+      .filter(lbFunction)
+      .build();
+  }
+
+  @Bean
+  EventClient postClient(WebClient webClientForChar) {
+    HttpServiceProxyFactory httpServiceProxyFactory =
+      HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClientForChar))
+        .build();
+    return httpServiceProxyFactory.createClient(EventClient.class);
   }
 }

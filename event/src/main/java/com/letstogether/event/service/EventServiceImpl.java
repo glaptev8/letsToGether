@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.letstogether.dto.EventStatus.PLANNING;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,7 +45,7 @@ public class EventServiceImpl implements EventService {
     if ((event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate()) || event.getStartDate().isBefore(LocalDateTime.now().plusHours(3)))) {
       return Mono.error(new ApiException("EVENT_ERROR", "End date is before start date or in the past")); // TODO: 2024-03-27 EventException
     }
-    event.setStatus(EventStatus.PLANNING);
+    event.setStatus(PLANNING);
     return transactionalOperator.transactional(
       eventRepository
         .save(event)
@@ -70,7 +72,7 @@ public class EventServiceImpl implements EventService {
   }
 
   private Mono<Event> validateEventForSubscription(Event event) {
-    if (!event.getStatus().equals(EventStatus.PLANNING)) {
+    if (!event.getStatus().equals(PLANNING)) {
       // TODO: Replace with EventNotPlanningException
       return Mono.error(new RuntimeException("Event is not planning"));
     }
@@ -133,7 +135,7 @@ public class EventServiceImpl implements EventService {
         if (Objects.equals(event.getCreatorId(), userId)) {
           return Mono.error(new RuntimeException("you can only delete this event")); // TODO: 2024-03-26 EventUnSubscribeException
         }
-        if (!event.getStatus().equals(EventStatus.PLANNING)) {
+        if (!event.getStatus().equals(PLANNING)) {
           return Mono.error(new RuntimeException("event is done")); // TODO: 2024-03-26 EventUnSubscribeException
         }
         return eventToUserRepository.findByEventIdAndUserId(eventId, userId)
@@ -159,7 +161,7 @@ public class EventServiceImpl implements EventService {
   @Override
   public Flux<Event> getAll(Long creatorId) {
     return eventRepository
-      .findAllByCreatorIdNotAndStatus(creatorId, EventStatus.PLANNING)
+      .findAllByCreatorIdNotAndStatus(creatorId, PLANNING)
       .doOnNext(event -> log.info("getAll event: {}", event));
   }
 
@@ -226,7 +228,9 @@ public class EventServiceImpl implements EventService {
   private Query getQueryByFilter(EventFilterDto filter, List<Long> ids) {
     System.out.println(ids);
     var query = Query.query(Criteria
-                              .from(criteria(filter).and("id").notIn(ids)));
+                              .from(criteria(filter)
+                                      .and("status").is(PLANNING)
+                                      .and("id").notIn(ids)));
     if (filter.getOffset() != null && filter.getLimit() != null) {
       query = query
         .offset((long) filter.getOffset())

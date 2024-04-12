@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.letstogether.chat.client.EventClient;
 import com.letstogether.chat.entity.Message;
 
 import org.springframework.stereotype.Service;
 
 import com.letstogether.chat.mapper.MapStructMapper;
 import com.letstogether.dto.ChatDto;
+import com.letstogether.dto.EventDto;
 import com.letstogether.dto.MessageDto;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -21,6 +23,7 @@ public class ChatServiceImpl implements ChatService {
   private final MemberService memberService;
   private final MessageService messageService;
   private final MapStructMapper mapper;
+  private final EventClient eventClient;
 
   @Override
   public Mono<Boolean> addUserToChat(Long userId, Long chatId) {
@@ -49,20 +52,33 @@ public class ChatServiceImpl implements ChatService {
     return memberService.getChatMembers(chatId.toString())
       .flatMap(members -> {
         if (!members.contains(userId.toString())) {
-          return Mono.error(new RuntimeException("User is not a member of the chat")); // TODO: Заменить на NoPermissionException
+          return eventClient.getEvents(userId)
+            .collectList()
+            .flatMap(events -> {
+              if (!events.stream().map(EventDto::getId).toList().contains(chatId)) {
+                return Mono.error(new RuntimeException("User is not a member of the chat")); // TODO: Заменить на NoPermissionException
+              } else {
+                return addUserToChat(userId, chatId)
+                  .then(getChat(chatId, userId));
+              }
+            });
         }
-        Mono<Set<Long>> membersMono = Mono.just(members.stream().map(Long::valueOf).collect(Collectors.toSet()));
-        Mono<List<MessageDto>> messagesMono = messageService
-          .getMessagesByChatId(chatId.toString())
-          .map(mapper::toDto)
-          .collectList();
-
-        return Mono.zip(membersMono, messagesMono, (m, msgs) -> {
-          var chatDto = new ChatDto();
-          chatDto.setUsersId(m);
-          chatDto.setMessages(msgs);
-          return chatDto;
-        });
+        return getChat(members, chatId);
       });
+  }
+
+  private Mono<ChatDto> getChat(Set<String> members, Long chatId) {
+    Mono<Set<Long>> membersMono = Mono.just(members.stream().map(Long::valueOf).collect(Collectors.toSet()));
+    Mono<List<MessageDto>> messagesMono = messageService
+      .getMessagesByChatId(chatId.toString())
+      .map(mapper::toDto)
+      .collectList();
+
+    return Mono.zip(membersMono, messagesMono, (m, msgs) -> {
+      var chatDto = new ChatDto();
+      chatDto.setUsersId(m);
+      chatDto.setMessages(msgs);
+      return chatDto;
+    });
   }
 }

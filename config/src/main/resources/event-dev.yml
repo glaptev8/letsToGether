@@ -5,5 +5,10 @@ spring:
     url: r2dbc:pool:postgres://localhost:5432/event
   flyway:
     url: jdbc:postgresql://localhost:5432/event
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: password
 server:
   port: 8083

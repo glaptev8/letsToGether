@@ -32,6 +32,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'io.micrometer:micrometer-tracing-bridge-brave'
   implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+  implementation 'org.springframework.boot:spring-boot-starter-amqp'
+  implementation 'org.springframework.amqp:spring-rabbit'
 
   implementation "com.letstogether:dto:$dto"
   implementation "com.letstogether:message-source-starter:$messagesource"

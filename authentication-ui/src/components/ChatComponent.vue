@@ -16,9 +16,16 @@
           </v-btn>
         </v-card-title>
 
-        <v-card-text style="height: 300px; overflow-y: auto;">
-          <div v-for="message in messages" :key="message.id">
-            {{ message.text }}
+        <v-card-text id="q" ref="messagesContainer" style="height: 300px; overflow-y: auto;">
+          <div v-for="message in messages" :key="message.id" :class="['message-item', { 'mine': message.userId == authData().userId }]">
+            <div class="message-content" id="q">
+              <v-avatar class="mr-2" left>
+                <img :src="`http://localhost:8082/auth/v1/img/${getPathToAvatar(message.userId)}`" width="40" height="40">
+              </v-avatar>
+              <span>{{ message.text }}</span>
+
+              <v-icon v-if="message.userId == props.event.creatorId" color="gold">mdi-crown</v-icon>
+            </div>
           </div>
         </v-card-text>
 
@@ -32,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, defineProps } from 'vue';
+import { ref, onUnmounted, defineProps, nextTick } from 'vue';
 import { authData } from '@/stores/auth';
 import axios from 'axios';
 
@@ -45,7 +52,26 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  participants: Array
 });
+
+const messagesContainer = ref(null);
+
+function scrollToBottom() {
+  // Здесь используется nextTick для гарантии, что DOM обновлен
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.$el.scrollTop = messagesContainer.value.$el.scrollHeight;
+    }
+  });
+}
+
+const getPathToAvatar = (senderId) => {
+  console.log('creator id = ' + props.event.creatorId)
+
+  const participant = props.participants.find(participant => participant.id == senderId)
+  return participant.pathToAvatar
+}
 
 const chatVisible = ref(false);
 const ws = ref(null);
@@ -56,6 +82,11 @@ const token = authData().token
 function showChat() {
   chatVisible.value = true;
   initializeWebSocket();
+  nextTick(() => {
+    var div = document.getElementById('q');
+    div.scrollTop = 200
+    scrollToBottom(); // Прокрутка при открытии чата
+  });
 }
 
 function closeChat() {
@@ -67,16 +98,22 @@ function closeChat() {
 }
 
 function initializeWebSocket() {
-  ws.value = new WebSocket(`ws://localhost:8082/chat-socket/${props.event.id}?token=${token}`);
+  ws.value = new WebSocket(`ws://localhost:8082/chat/socket/${props.event.id}?token=${token}`);
 
   ws.value.onopen = async () => {
     const response = await axios.post(`/chat/v1/${props.event.id}`)
-    console.log('reee  ' + response)
+    if (response.status === 200) {
+      messages.value = response.data.messages;
+      await nextTick(scrollToBottom);
+    }
+    console.log(response)
   };
 
   ws.value.onmessage = (event) => {
     const message = JSON.parse(event.data);
     messages.value.push(message);
+    nextTick(scrollToBottom);
+    console.log(messages)
   };
 
   ws.value.onerror = (error) => {
@@ -89,9 +126,17 @@ function initializeWebSocket() {
 }
 
 function sendMessage() {
-  if (newMessage.value !== '') {
-    ws.value.send(JSON.stringify({ text: newMessage.value }));
+  if (newMessage.value.trim() !== '' && ws.value && ws.value.readyState === WebSocket.OPEN) {
+    const messageToSend = {
+      eventId: props.event.id,
+      text: newMessage.value.trim()
+    };
+
+    ws.value.send(JSON.stringify(messageToSend));
+    scrollToBottom(); // Прокрутка после загрузки сообщений
     newMessage.value = ''; // Очистка поля ввода после отправки
+  } else {
+    console.error('WebSocket не подключен или сообщение пустое.');
   }
 }
 
@@ -103,6 +148,25 @@ onUnmounted(() => {
 </script>
 
 
-<style scoped lang="sass">
+<style scoped>
+.message-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
 
+.message-item.mine {
+  justify-content: flex-end;
+}
+
+.message-item .message-content {
+  max-width: 60%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+}
+
+.message-item.mine .message-content {
+  background-color: #e0e0ff; /* Цвет фона для сообщений от текущего пользователя */
+}
 </style>
