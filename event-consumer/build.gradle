@@ -41,10 +41,15 @@ dependencies {
   annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
   compileOnly "org.mapstruct:mapstruct:$mapStructVersion"
 
-  testImplementation "org.testcontainers:junit-jupiter:$jupiter"
   testImplementation 'io.projectreactor:reactor-test'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
 }
 
 tasks.named('test') {
