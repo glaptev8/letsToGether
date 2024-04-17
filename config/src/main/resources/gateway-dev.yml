@@ -9,7 +9,7 @@ spring:
         - id: authorization
           uri: lb://authentication
           predicates:
-            - Path=/auth/**
+            - Path=/auth/**,/oauth2/**
         - id: event
           uri: lb://event
           predicates:
