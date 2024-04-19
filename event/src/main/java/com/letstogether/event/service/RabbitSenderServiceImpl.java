@@ -41,7 +41,7 @@ public class RabbitSenderServiceImpl implements RabbitSenderService{
   private Mono<Void> sendMessage(EventStatusMessage message, long delay) {
     return Mono.fromCallable(() -> {
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, ROUTING_KEY, message, msg -> {
-//          msg.getMessageProperties().setDelayLong(delay);
+          msg.getMessageProperties().setDelayLong(delay);
           return msg;
         });
         return null;
