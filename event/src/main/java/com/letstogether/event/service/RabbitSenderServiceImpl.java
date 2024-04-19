@@ -27,7 +27,7 @@ public class RabbitSenderServiceImpl implements RabbitSenderService{
     long delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), savedEvent.getStartDate());
     EventStatusMessage message = new EventStatusMessage(savedEvent.getId(), IN_PROGRESS);
 
-    return sendMessage(message, 0);
+    return sendMessage(message, delay);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class RabbitSenderServiceImpl implements RabbitSenderService{
     long delay = ChronoUnit.MILLIS.between(LocalDateTime.now(), savedEvent.getStartDate().plusHours(1).plusMinutes(30));
     EventStatusMessage message = new EventStatusMessage(savedEvent.getId(), COMPLETED);
 
-    return sendMessage(message, 0);
+    return sendMessage(message, delay);
   }
 
   private Mono<Void> sendMessage(EventStatusMessage message, long delay) {
