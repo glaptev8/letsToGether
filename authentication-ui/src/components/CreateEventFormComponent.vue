@@ -35,7 +35,7 @@
                     ref="mapRef"
                     clickable
                     @click="addMarkerByClick"
-                    api-key="AIzaSyAFj7qH5ub0o-wT-ecPalLQcQZRQrBh11M"
+                    api-key="AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
                     :center='event.center'
                     :zoom='12'
                     style='width:100%;  height: 400px;'
@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref, watch } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 import { staticData } from '@/stores/static';
 import { GoogleMap, Marker } from 'vue3-google-map';
 import axios from 'axios';
@@ -121,15 +121,13 @@ async function saveEvent() {
     minParticipant: event.value.minParticipant,
     maxParticipant: event.value.maxParticipant,
     address: event.value.address,
-    lng: event.value.center.lng,
-    lat: event.value.center.lat
+    lng: event.value.markers[0].position.lng,
+    lat: event.value.markers[0].position.lat
   };
 
   try {
     const response = await axios.post('/event/v1', eventData);
-    console.log(response)
     if (response.status === 200) {
-      console.log('Event saved successfully', response.data);
       dialog.value = false;
       resetForm();
     }
@@ -208,7 +206,7 @@ let setStreetAddressFrom = async (lat, long) => {
       lat +
       "," +
       long +
-      "&key=AIzaSyAFj7qH5ub0o-wT-ecPalLQcQZRQrBh11M"
+      "&key=AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
     );
     if(data.error_message) {
       console.log(data.error_message)

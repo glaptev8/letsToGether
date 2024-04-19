@@ -1,5 +1,7 @@
 package com.letstogether.event.repository;
 
+import java.util.List;
+
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 
@@ -19,6 +21,8 @@ public interface EventRepository extends R2dbcRepository<Event, Long> {
   Flux<Event> findAllUsersEventByUserId(Long userId);
 
   Flux<Event> findAllByCreatorIdNotAndStatus(Long creatorId, EventStatus status);
+
+  Flux<Event> findAllByIdInAndStatus(List<Long> ids, EventStatus status);
 
   Mono<Boolean> existsByIdAndStatus(Long id, EventStatus eventStatus);
 }

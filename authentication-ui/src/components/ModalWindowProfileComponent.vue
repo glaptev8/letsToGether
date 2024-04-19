@@ -1,17 +1,17 @@
 <template>
   <v-dialog v-model="localDialog" max-width="600px">
     <v-card>
-        <RegistrationFormComponent/>
+        <ProfileFormComponent/>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import RegistrationFormComponent from '@/components/RegistrationFormComponent.vue';
+import ProfileFormComponent from '@/components/ProfileFormComponent.vue';
 
 export default {
-  name: "ModalWindowRegistrationComponent",
-  components: { RegistrationFormComponent },
+  name: "ModalWindowProfileComponent",
+  components: { ProfileFormComponent },
   props: {
     value: Boolean
   },

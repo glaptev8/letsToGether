@@ -34,7 +34,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
   private final WebClient webClient;
 
   private final String[] publicRoutes = new String[]{
-    "/auth/v1/login",
+    "/auth/v1/login/google",
+    "/oauth2/**",
+    "/login/oauth2/code/google",
     "/auth/v1/register",
     "/auth/v1/img/**",
     "/static/v1"};

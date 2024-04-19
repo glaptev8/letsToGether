@@ -1,6 +1,6 @@
 <template>
   <v-card class="event-card">
-    <!--    style="line-height: 1rem; margin-top:7px"-->
+    <!-- Заголовок и информация о событии -->
     <v-card-title class="my-card-title pb-0 d-flex justify-space-between">
       <span>{{ event.name }}</span>
       <v-chip x-small class="status-chip">{{ event.status }}</v-chip>
@@ -10,7 +10,7 @@
     </v-card-subtitle>
     <v-card-text class="pt-2 pb-0">
       <div class="cut-text" @click="switchParticipantDialog">
-        <span class="text-caption">{{ 'Участники ' + userIds.length + '/' + event.maxParticipant }} </span>
+        <span class="text-caption">{{ 'Участники ' + userIds.length + '/' + event.maxParticipant }}</span>
       </div>
       <div class="cut-text"><strong>Адрес:</strong> <span @click="mapDialog = true">{{ event.address }}</span></div>
       <div class="cut-text"><span @click="descriptionDialog = !descriptionDialog">{{ event.description }}</span></div>
@@ -19,24 +19,30 @@
       </v-chip-group>
     </v-card-text>
     <v-card-actions class="pt-0 pb-0 d-flex justify-space-between">
-      <template v-if="event.creatorId !== userId">
-        <v-btn x-small class="mr-1" color="secondary" @click="subscribe">
-          <span class="text-caption">{{ subscribed ? 'UnSubscribe' : 'Subscribe' }}</span>
+      <template v-if="event.status === 'COMPLETED' && event.creatorId !== userId">
+        <v-btn x-small color="secondary" @click="showReviewDialogOpen">
+          <span class="text-caption">Review</span>
         </v-btn>
       </template>
-      <template v-else>
-        <v-btn x-small class="mr-1" color="secondary" @click="remove">
-          <span class="text-caption">remove</span>
+      <template v-else-if="event.creatorId === userId && event.status !== 'COMPLETED'">
+        <v-btn x-small color="secondary" @click="remove">
+          <span class="text-caption">Remove</span>
+        </v-btn>
+      </template>
+      <template v-if="event.creatorId !== userId && event.status !== 'COMPLETED'">
+        <v-btn x-small color="secondary" @click="subscribe">
+          <span class="text-caption">{{ subscribed ? 'UnSubscribe' : 'Subscribe' }}</span>
         </v-btn>
       </template>
       <ChatComponent :subscribed="subscribed" :event="event" :participants="participants"/>
     </v-card-actions>
   </v-card>
-  <ModalMapComponent :address="event.address" :center="{ lat: event.lat, lng: event.lng }" :zoom="15"
-                     v-model="mapDialog"/>
+  <review-modal-component @showSuccess="showSuccess" @showError="showError" v-model="showReviewDialog" :event-name="event.name" :event-id="event.id"/>
+  <ModalMapComponent :address="event.address" :center="{ lat: event.lat, lng: event.lng }" :zoom="15" v-model="mapDialog"/>
   <DescriptionModalComponent :description="event.description" v-model="descriptionDialog"/>
   <ParticipantsModalComponent :participants="participants" v-model="participantsDialog"/>
 </template>
+
 
 <script setup>
 import { defineProps, onMounted, ref } from 'vue';
@@ -47,8 +53,9 @@ import ParticipantsModalComponent from '@/components/ParticipantsModalComponent.
 import axios from 'axios';
 import { authData } from '@/stores/auth';
 import ChatComponent from '@/components/ChatComponent.vue';
+import ReviewModalComponent from '@/components/ReviewModalComponent.vue';
 
-const emit = defineEmits(['eventRemoved', 'showError']);
+const emit = defineEmits(['eventRemoved', 'showError', 'showSuccess', 'closeModalIfMap']);
 
 const props = defineProps({
   event: {
@@ -62,9 +69,6 @@ const props = defineProps({
 });
 const userId = authData().userId;
 
-console.log(authData().userId)
-
-
 const mapDialog = ref(false)
 const descriptionDialog = ref(false)
 const participantsDialog = ref(false)
@@ -74,23 +78,47 @@ const switchParticipantDialog = async () => {
   participantsDialog.value = !participantsDialog.value
   await loadParticipants();
 }
+const showReviewDialog = ref(false);
+
 const loadParticipants = async () => {
   if (participants.value.length === 0) {
     try {
       participants.value = await fetchAvatarsByUserIds(userIds.value)
-      console.log(participants)
     } catch (error) {
       console.log(error)
     }
   }
 }
 
-let remove = async () => {
+let showError = (message) => {
+  emit('showError', message);
+};
+
+let showSuccess = (message) => {
+  emit('showSuccess', message);
+};
+
+
+const showReviewDialogOpen = async () => {
+  try {
+    const response = await axios.post('/event/v1/review/check', {
+      eventId: props.event.id
+    });
+    if (response.data) {
+      showReviewDialog.value = true;
+    }
+  } catch (e) {
+    console.error(e);
+    emit('showError', 'It is not allowed to leave comments twice');
+  }
+}
+
+const remove = async () => {
   let updateStatusRequestDto = {
     eventId: props.event.id,
     eventStatus: 'CANCELED'
   }
-  const response = await axios.post(`/event/v1/cancel`, updateStatusRequestDto)
+  const response = await axios.post(`/event/v1/updatestatus`, updateStatusRequestDto)
   if (response && response.status === 200) {
     emit('eventRemoved', props.event.id);
   }
@@ -100,11 +128,11 @@ let remove = async () => {
 }
 
 let subscribe = async () => {
-  console.log(props.event.id)
   const url = !props.subscribed ? `/event/v1/subscribe?eventId=${props.event.id}` : `/event/v1/unsubscribe?eventId=${props.event.id}`
   const response = await axios.post(url)
   if (response && response.status === 200) {
     emit('eventRemoved', props.event.id);
+    emit('closeModalIfMap', props.event.id);
   } else {
     emit('showError', `Не удалось ${props.subscribed ? 'отписаться' : 'подписаться'} на событие, попробуйте еще раз`);
   }

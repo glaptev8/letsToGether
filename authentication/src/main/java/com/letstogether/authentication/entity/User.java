@@ -11,11 +11,13 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.letstogether.dto.GenderType;
 import com.letstogether.dto.HobbyType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @Table("users")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +26,9 @@ public class User {
   @Id
   private Long id;
   private String firstName;
-  private String password;
   private String lastName;
   private String aboutMe;
+  private String providerId;
   @Transient
   private Set<HobbyType> hobbies;
   private GenderType gender;

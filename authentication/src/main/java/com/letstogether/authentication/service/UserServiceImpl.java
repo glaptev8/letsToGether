@@ -34,23 +34,21 @@ public class UserServiceImpl implements UserService {
   private final HobbyRepository hobbyRepository;
 
   @Override
-  public Mono<User> saveUser(User user, FilePart avatar) {
-    log.info("Saving user {}", user);
-    return imageServiceImpl.savePhoto(avatar)
-      .doOnNext(user::setPathToAvatar)
-      .then(saveUser(user))
-      .flatMap(this::setUserHobbies)
-      .doOnNext(savedUser -> log.info("user was saved: {}", savedUser));
-  }
-
-  @Override
   public Mono<TokenDetails> login(User user) {
-    return securityService.authentication(user.getEmail(), user.getPassword());
+    return securityService.authentication(user);
   }
 
   @Override
-  public Mono<User> updateUser(User user) {
-    return userRepository.save(user);
+  public Mono<User> updateUser(User user, FilePart avatar) {
+    return userRepository.findById(user.getId())
+      .flatMap(u -> {
+        user.setProviderId(u.getProviderId());
+        user.setCreatedAt(u.getCreatedAt());
+        return imageServiceImpl.savePhoto(avatar)
+          .doOnNext(user::setPathToAvatar)
+          .then(userRepository.save(user));
+      })
+      .flatMap(this::setUserHobbies);
   }
 
   @Override
@@ -84,27 +82,20 @@ public class UserServiceImpl implements UserService {
     return userRepository.findAvatarByUserId(userId);
   }
 
-  private Mono<User> saveUser(User user) {
-    return userRepository.existsByEmailOrPhone(user.getEmail(), user.getPhone())
-      .flatMap(exists -> {
-        if (exists) {
-          return Mono.error(new UserExistsException(
-            messageSourceService.logMessage("user.exits.code"),
-            messageSourceService.logMessage("user.exits.message")));
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
-      });
-  }
 
   private Mono<User> setUserHobbies(User user) {
-    user.setHobbies(user.getHobbies());
-    return Flux.fromIterable(user.getHobbies())
-      .flatMap(hobby -> hobbyRepository.save(Hobby.builder()
-                                               .userId(user.getId())
-                                               .hobby(hobby)
-                                               .build()))
-      .collectList()
-      .thenReturn(user);
+    return hobbyRepository.deleteAllByUserId(user.getId())
+      .thenMany(Mono.justOrEmpty(user.getHobbies())  // Оборачиваем в Mono для обработки null
+                  .flatMapMany(Flux::fromIterable)  // Преобразуем List в Flux
+                  .flatMap(hobby -> hobbyRepository.save(Hobby.builder()
+                                                           .userId(user.getId())
+                                                           .hobby(hobby)
+                                                           .build())))
+      .then(Mono.just(user))  // Возвращаем пользователя после завершения всех операций
+      .onErrorResume(e -> {
+        // Логирование или обработка ошибок
+        System.out.println("Произошла ошибка при обновлении увлечений пользователя: " + e.getMessage());
+        return Mono.error(new RuntimeException("Ошибка при обновлении увлечений пользователя", e));
+      });
   }
 }

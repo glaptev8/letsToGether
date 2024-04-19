@@ -3,6 +3,6 @@ package com.letstogether.exception;
 public class UnauthorizedException extends ApiException {
 
   public UnauthorizedException(String message) {
-    super("WEATHERAPI_UNAUTHORIZED", message);
+    super("LETS_TO_GETHER_UNAUTHORIZED", message);
   }
 }

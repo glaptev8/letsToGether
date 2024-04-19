@@ -10,11 +10,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface UserService {
-  Mono<User> saveUser(User user, FilePart avatar);
-
   Mono<TokenDetails> login(User user);
 
-  Mono<User> updateUser(User user);
+  Mono<User> updateUser(User user, FilePart avatar);
 
   Mono<User> getUserById(Long userId);
 

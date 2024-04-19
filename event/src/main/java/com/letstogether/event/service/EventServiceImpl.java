@@ -15,10 +15,15 @@ import com.letstogether.dto.ActivityType;
 import com.letstogether.dto.AddUserRequestDto;
 import com.letstogether.dto.EventFilterDto;
 import com.letstogether.dto.EventStatus;
+import com.letstogether.dto.FindReviewRequestDto;
+import com.letstogether.dto.ReviewDto;
 import com.letstogether.event.client.ChatClient;
+import com.letstogether.event.dao.EventDao;
 import com.letstogether.event.entity.Event;
+import com.letstogether.event.entity.EventReview;
 import com.letstogether.event.entity.EventToUser;
 import com.letstogether.event.repository.EventRepository;
+import com.letstogether.event.repository.EventReviewRepository;
 import com.letstogether.event.repository.EventToUserRepository;
 import com.letstogether.exception.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.letstogether.dto.EventStatus.COMPLETED;
 import static com.letstogether.dto.EventStatus.PLANNING;
 
 @Slf4j
@@ -39,6 +45,8 @@ public class EventServiceImpl implements EventService {
   private final ChatClient chatClient;
   private final R2dbcEntityTemplate entityTemplate;
   private final RabbitSenderService rabbitSenderService;
+  private final EventReviewRepository eventReviewRepository;
+  private final EventDao eventDao;
 
   @Override
   public Mono<Event> save(Event event) {
@@ -183,13 +191,8 @@ public class EventServiceImpl implements EventService {
     return eventRepository
       .findById(eventId)
       .doOnSuccess(event -> log.info("event was find {}", event))
+      .flatMap(event -> validateEvent(userId, event))
       .flatMap(event -> {
-        if (event.getStatus().equals(EventStatus.COMPLETED)) {
-          return Mono.error(new RuntimeException("Event is already completed")); // TODO: 2024-03-26 EventException
-        }
-        if (!Objects.equals(event.getCreatorId(), userId)) {
-          return Mono.error(new RuntimeException("you can not delete this event"));
-        }
         event.setStatus(newEventStatus);
         return eventRepository
           .save(event)
@@ -198,19 +201,42 @@ public class EventServiceImpl implements EventService {
       .switchIfEmpty(Mono.error(new RuntimeException("event not found"))); // TODO: 2024-03-26 EventNotFoundException
   }
 
+  private Mono<Event> validateEvent(Long userId, Event event) {
+    if (event.getStatus().equals(EventStatus.COMPLETED)) {
+      return Mono.error(new RuntimeException("Event is already completed"));
+    }
+    if (userId != null && !Objects.equals(event.getCreatorId(), userId)) {
+      return Mono.error(new RuntimeException("you can not delete this event"));
+    }
+    return Mono.just(event);
+  }
+
   @Override
   public Flux<Event> getEventsByFilter(EventFilterDto filter, Long userId) {
     log.info("looking for events by filter: {}", filter);
     return eventToUserRepository.findAllByUserIdAndSubscribed(userId)
       .collectList()
-      .flatMapMany(ids -> {
-        return entityTemplate
-          .select(Event.class)
-          .matching(getQueryByFilter(filter, ids))
-          .all()
-          .sort(Comparator.comparing(Event::getStartDate))
-          .doOnError(e -> log.error("error finding events", e));
-      });
+      .flatMapMany(ids ->
+          eventDao.findEventsByFilter(filter, ids)
+//                     entityTemplate
+//        .select(Event.class)
+//        .matching(getQueryByFilter(filter, ids))
+//        .all()
+//        .sort(Comparator.comparing(Event::getStartDate))
+        .doOnError(e -> log.error("error finding events", e)));
+  }
+
+  @Override
+  public Flux<EventReview> getEventReviews(FindReviewRequestDto findReviewDto) {
+    if (findReviewDto.getUserId() != null) {
+      return eventToUserRepository.findAllByUserIdAndSubscribed(findReviewDto.getUserId())
+        .collectList()
+        .flatMap(ids -> eventRepository.findAllByIdInAndStatus(ids, COMPLETED)
+          .map(Event::getId)
+          .collectList())
+        .flatMapMany(eventReviewRepository::findAllByEventIdIn);
+    }
+    return eventReviewRepository.findAllByEventIdIn(findReviewDto.getEventsIds());
   }
 
   @Override
@@ -219,11 +245,8 @@ public class EventServiceImpl implements EventService {
   }
 
   private Query getQueryByFilter(EventFilterDto filter, List<Long> ids) {
-    System.out.println(ids);
     var query = Query.query(Criteria
-                              .from(criteria(filter)
-                                      .and("status").is(PLANNING)
-                                      .and("id").notIn(ids)));
+                              .from(criteria(filter, ids)));
     if (filter.getOffset() != null && filter.getLimit() != null) {
       query = query
         .offset((long) filter.getOffset())
@@ -231,6 +254,46 @@ public class EventServiceImpl implements EventService {
     }
 
     return query;
+  }
+
+  @Override
+  public Mono<Void> review(Long userId, ReviewDto reviewDto) {
+    return eventRepository.findById(reviewDto.getEventId())
+      .flatMap(event -> validateEventForReview(event, userId))
+      .flatMap(event -> eventReviewRepository.save(EventReview.builder()
+                                                     .eventId(reviewDto.getEventId())
+                                                     .userId(userId)
+                                                     .grade(reviewDto.getGrade())
+                                                     .review(reviewDto.getMessage())
+                                                     .build()))
+      .then();
+  }
+
+  @Override
+  public Mono<Boolean> reviewCheck(Long userId, ReviewDto reviewDto) {
+    return eventRepository.findById(reviewDto.getEventId())
+      .flatMap(event -> validateEventForReview(event, userId))
+      .then(Mono.just(true));
+  }
+
+  private Mono<Event> validateEventForReview(Event event, Long userId) {
+    if (!event.getStatus().equals(EventStatus.COMPLETED)) {
+      return Mono.error(new RuntimeException("Event is not completed")); // TODO: 2024-04-12 ReviewNotAllowedException
+    }
+    if (event.getCreatorId().equals(userId)) {
+      return Mono.error(new RuntimeException("You cannot review your own event")); // TODO: 2024-04-12 ReviewNotAllowedException
+    }
+    return eventToUserRepository.findByEventIdAndUserId(event.getId(), userId)
+      .switchIfEmpty(Mono.error(new RuntimeException("User is not subscribed to any event"))) // TODO: 2024-04-12 ReviewNotAllowedException
+      .flatMap(eventUser -> {
+        if (!eventUser.getSubscribed()) {
+          return Mono.error(new RuntimeException("You cannot review this event")); // TODO: 2024-04-12 ReviewNotAllowedException
+        }
+        // Проверка на наличие предыдущего отзыва
+        return eventReviewRepository.findByEventIdAndUserId(event.getId(), userId)
+          .flatMap(eventReview -> Mono.error(new RuntimeException("You cannot review this event twice"))) // TODO: 2024-04-12 ReviewNotAllowedException
+          .then(Mono.just(event)); // Возвращаем событие, если отзыва нет
+      }); // Возвращаем событие, если отзыва нет);
   }
 
   private Mono<Event> doProcessRelatedToSavingEvent(Event savedEvent) {
@@ -250,7 +313,7 @@ public class EventServiceImpl implements EventService {
       .build();
   }
 
-  private Criteria criteria(EventFilterDto eventFilterDto) {
+  private Criteria criteria(EventFilterDto eventFilterDto, List<Long> ids) {
     var criteria = Criteria.from();
 
     var timeNow = LocalDateTime.now();
@@ -261,15 +324,29 @@ public class EventServiceImpl implements EventService {
 
     if (eventFilterDto.getEventStatus() != null) {
       criteria = criteria.and("status").is(eventFilterDto.getEventStatus());
+    } else {
+      criteria = criteria.and("status").is(PLANNING);
     }
     if (eventFilterDto.getEndDate() != null) {
       criteria = criteria.and("end_date").lessThan(eventFilterDto.getEndDate());
     }
-    criteria = criteria.and("start_date").greaterThan(filterDate);
+    if (eventFilterDto.getEventStatus() != COMPLETED) {
+      criteria = criteria.and("start_date").greaterThan(filterDate);
+    } else {
+      criteria = criteria.and("start_date").lessThan(LocalDateTime.now());
+    }
     if (eventFilterDto.getActivityType() != null) {
       criteria = criteria.and("activity_type").is(eventFilterDto.getActivityType());
     } else if (eventFilterDto.getActivityGroup() != null) {
       criteria = criteria.and("activity_type").in(ActivityType.groupedActivity.get(eventFilterDto.getActivityGroup()));
+    }
+    if (eventFilterDto.getOwn()) {
+      criteria = criteria.and("id").in(ids);
+    } else {
+      criteria = criteria.and("id").notIn(ids);
+    }
+    if (eventFilterDto.getLat() != null && eventFilterDto.getLng() != null && eventFilterDto.getRadius() != null) {
+
     }
     return criteria;
   }

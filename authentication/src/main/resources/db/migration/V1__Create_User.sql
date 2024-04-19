@@ -5,12 +5,12 @@ create table if not exists public.users
         primary key,
     first_name varchar(128) not null,
     last_name  varchar(128) not null,
-    password varchar(2048) not null,
-    age        integer      not null,
-    about_me  varchar(256) not null,
+    age        integer,
+    about_me  varchar(256),
     path_to_avatar varchar(4096),
     gender     varchar(32),
-    email      varchar(128),
-    phone      varchar(128) not null,
+    email      varchar(128) not null,
+    phone      varchar(128),
+    provider_id varchar(512) not null,
     created_at TIMESTAMP not null default now()
 );

@@ -20,7 +20,8 @@
           <div v-for="message in messages" :key="message.id" :class="['message-item', { 'mine': message.userId == authData().userId }]">
             <div class="message-content" id="q">
               <v-avatar class="mr-2" left>
-                <img :src="`http://localhost:8082/auth/v1/img/${getPathToAvatar(message.userId)}`" width="40" height="40">
+                <img v-if="!imageError" width="40" height="40" :src="`http://localhost:8082/auth/v1/img/${getPathToAvatar(message.userId)}`" @error="handleImageError" alt="User Avatar">
+                <span v-else class="avatar-initials">{{ getInitials(message.userId) }}</span>
               </v-avatar>
               <span>{{ message.text }}</span>
 
@@ -66,9 +67,18 @@ function scrollToBottom() {
   });
 }
 
-const getPathToAvatar = (senderId) => {
-  console.log('creator id = ' + props.event.creatorId)
+const getInitials = (senderId) => {
+  const participant = props.participants.find(participant => participant.id == senderId)
+  return `${participant.firstName[0]}${participant.lastName[0]}`;
+}
 
+const imageError = ref(false);
+
+function handleImageError() {
+  imageError.value = true;
+}
+
+const getPathToAvatar = (senderId) => {
   const participant = props.participants.find(participant => participant.id == senderId)
   return participant.pathToAvatar
 }
@@ -106,14 +116,12 @@ function initializeWebSocket() {
       messages.value = response.data.messages;
       await nextTick(scrollToBottom);
     }
-    console.log(response)
   };
 
   ws.value.onmessage = (event) => {
     const message = JSON.parse(event.data);
     messages.value.push(message);
     nextTick(scrollToBottom);
-    console.log(messages)
   };
 
   ws.value.onerror = (error) => {
@@ -165,6 +173,8 @@ onUnmounted(() => {
   border-radius: 10px;
   background-color: #f0f0f0;
 }
+
+
 
 .message-item.mine .message-content {
   background-color: #e0e0ff; /* Цвет фона для сообщений от текущего пользователя */

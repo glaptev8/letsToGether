@@ -1,5 +1,6 @@
 <template>
-  <v-card-title v-if="!successMessage" class="text-h5">Регистрация</v-card-title>
+  <v-card-title v-if="!successMessage" class="text-h5">Profile</v-card-title>
+  <v-card-subtitle>Tell everyone about you</v-card-subtitle>
   <div class="avatar-preview" v-if="previewAvatar">
     <img :src="previewAvatar" alt="Предварительный просмотр аватара" class="preview-image">
   </div>
@@ -8,27 +9,21 @@
       <v-text-field
         label="First Name"
         v-model="user.firstName"
+        disabled
         required
       ></v-text-field>
 
       <v-text-field
         label="Last Name"
         v-model="user.lastName"
+        disabled
         required
       ></v-text-field>
 
       <v-text-field
         label="Email"
         v-model="user.email"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        label="Password"
-        v-model="user.password"
-        :type="showPassword ? 'text' : 'password'"
-        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        @click:append="showPassword = !showPassword"
+        disabled
         required
       ></v-text-field>
 
@@ -81,7 +76,7 @@
         </v-alert>
       </v-card-text>
       <v-btn color="primary" :disabled="!valid" type="submit">
-        Register
+        save
       </v-btn>
     </v-form>
     <v-card-text>
@@ -96,16 +91,15 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 import { staticData } from '@/stores/static';
+import { authData } from '@/stores/auth';
 
 const errorMessages = ref(null);
 const successMessage = ref(null);
 const valid = ref(true);
-const showPassword = ref(false);
 const user = ref({
   firstName: '',
   lastName: '',
   email: '',
-  password: '',
   hobbies: [],
   aboutMe: '',
   gender: '',
@@ -122,10 +116,6 @@ const emailRules = [
   v => !!v || 'E-mail is required',
   v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
 ];
-const passwordRules = [
-  v => !!v || 'Password is required',
-  v => v.length >= 6 || 'Password must be more than 6 characters',
-];
 const ageRules = [
   v => !!v || 'Age is required',
   v => v >= 18 || 'You must be at least 18 years old',
@@ -140,27 +130,35 @@ const submit = () => {
     formData.append('firstName', user.value.firstName);
     formData.append('lastName', user.value.lastName);
     formData.append('email', user.value.email);
-    formData.append('password', user.value.password);
-    formData.append('gender', user.value.gender);
-    formData.append('hobbies', user.value.hobbies);
-    formData.append('aboutMe', user.value.aboutMe);
-    formData.append('age', user.value.age);
-    formData.append('phone', user.value.phone);
+    if (user.value.gender) {
+      formData.append('gender', user.value.gender);
+    }
+    if (user.value.hobbies) {
+      formData.append('hobbies', user.value.hobbies);
+    }
+    if (user.value.aboutMe) {
+      formData.append('aboutMe', user.value.aboutMe);
+    }
+    if (user.value.age) {
+      formData.append('age', user.value.age);
+    }
+    if (user.value.phone) {
+      formData.append('phone', user.value.phone);
+    }
     if (avatar.value) {
       formData.append('avatar', avatar.value[0]);
     }
 
-    axios.post('/auth/v1/register', formData)
+    axios.post('/auth/v1/update', formData)
       .then(response => {
-        successMessage.value = "Поздравляем, вы успешно зарегистрировались, пожалуйста, авторизируйтесь";
-        console.log('Registration successful:', response.data);
+        successMessage.value = "Информация обновлена";
       })
       .catch(error => {
-        console.error('Registration failed:', error);
+        console.error('failed:', error);
         if (error.response && error.response.data && error.response.data.body && error.response.data.body.message) {
           errorMessages.value = error.response.data.body.message;
         } else {
-          errorMessages.value = "Произошла ошибка при регистрации. Пожалуйста, попробуйте снова.";
+          errorMessages.value = "Произошла ошибка. Пожалуйста, попробуйте снова.";
         }
       });
   }
@@ -173,8 +171,18 @@ watch(avatar, (newValue) => {
     previewAvatar.value = null;
   }
 });
-</script>
 
+onMounted(async () => {
+  const userId = authData().userId
+  const response = await axios.get(`/auth/v1/user/${userId}`);
+  if (response.status === 200 && response.data) {
+    user.value = {
+      ...user.value, // сохраняем текущие значения
+      ...response.data // обновляем данными с сервера
+    };
+  }
+})
+</script>
 
 <style scoped>
 .avatar-preview {

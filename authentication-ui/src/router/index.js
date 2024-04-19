@@ -9,6 +9,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {path: '/', component: () => import('@/pages/MainPage.vue')},
+  {path: '/auth-success', component: () => import('@/components/AuthSuccessComponent.vue')},
 ]
 
 const router = createRouter({

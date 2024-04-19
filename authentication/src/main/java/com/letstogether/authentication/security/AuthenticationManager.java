@@ -17,6 +17,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
   @Override
   public Mono<Authentication> authenticate(Authentication authentication) {
+//    return Mono.just(authentication);
     var principal = (CustomPrincipal) authentication.getPrincipal();
     return userRepository
       .findById(principal.id())

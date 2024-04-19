@@ -1,21 +1,48 @@
 <template>
-  <v-col cols="12" sm="4">
+  <v-col cols="12" sm="3">
     <v-text-field
       label="Date*"
       type="datetime-local"
       v-model="filter.startDate"
+      append-icon="mdi-close-circle"
+      @click:append="() => filter.startDate = null"
     />
   </v-col>
 
-  <v-col cols="12" sm="4">
-    <v-select v-model="filter.activityGroup" :items="activityGroups" label="Группа активности"></v-select>
+  <v-col cols="12" sm="3">
+    <v-select
+      v-model="filter.activityGroup"
+      :items="activityGroups"
+      label="Группа активности"
+      append-icon="mdi-close-circle"
+      @click:append="() => filter.activityGroup = null"
+    ></v-select>
   </v-col>
 
-  <v-col cols="12" sm="4">
-    <v-select v-model="filter.activityType" :items="activityTypes" item-text="name" item-value="value" label="Тип активности"></v-select>
+  <v-col cols="12" sm="3">
+    <v-select
+      v-model="filter.activityType"
+      :items="activityTypes"
+      item-text="name"
+      item-value="value"
+      label="Тип активности"
+      append-icon="mdi-close-circle"
+      @click:append="() => filter.activityType = null"
+    ></v-select>
   </v-col>
-
+  <v-col cols="12" sm="3">
+    <v-select
+      v-model="filter.radius"
+      :items="radiusOptions"
+      label="Radius"
+      item-title="text"
+      item-value="value"
+      append-icon="mdi-close-circle"
+      @click:append="() => filter.radius = null"
+    ></v-select>
+  </v-col>
 </template>
+
 <script setup>
 import { ref, watch } from 'vue';
 import { staticData } from '@/stores/static';
@@ -26,6 +53,7 @@ const filter = ref({
   startDate: null,
   activityType: null,
   activityGroup: null,
+  radius: null
 });
 
 function updateFilter() {
@@ -34,31 +62,13 @@ function updateFilter() {
 
 watch(filter, updateFilter, { deep: true });
 
-const activityGroups = ['CLEAN_FILTER', ...Object.keys(staticData().activityGroups)]
-let activityTypes = ref(getFlatActivityTypes())
+const activityGroups = Object.keys(staticData().activityGroups)
+let activityTypes = Object.values(staticData().activityGroups).flat()
 
-watch(() => filter.value.activityType, (newValue) => {
-  if (newValue && newValue === 'CLEAN_FILTER') {
-    filter.value.activityType = null
-  }
-});
+const radiusOptions = ref([
+  { text: '5 km', value: 5 },
+  { text: '10 km', value: 10 },
+  { text: '20 km', value: 20 }
+])
 
-watch(() => filter.value.activityGroup, (newValue) => {
-  if (newValue && newValue === 'CLEAN_FILTER') {
-    filter.value.activityGroup = null
-    activityTypes.value = getFlatActivityTypes()
-  }
-  else if (newValue) {
-    activityTypes.value = ['CLEAN_FILTER', ...staticData().activityGroups[newValue]]
-    if (!staticData().activityGroups[newValue].includes(filter.value.activityType)) {
-      filter.value.activityType = null
-    }
-  } else {
-    activityTypes.value = getFlatActivityTypes()
-  }
-});
-
-function getFlatActivityTypes() {
-  return ['CLEAN_FILTER', ...Object.values(staticData().activityGroups).flat()];
-}
 </script>

@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class SecurityService {
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MessageSourceService messageSourceService;
@@ -32,7 +33,7 @@ public class SecurityService {
   @Value("${jwt.issuer}")
   private String issuer;
 
-  private TokenDetails generateToken(User user) {
+  private TokenDetails generateToken(User user, boolean isFirstEnter) {
     var expirationDate = new Date(new Date().getTime() + expirationInSeconds * 1000);
     var createdDate = new Date();
     String token = Jwts.builder()
@@ -46,11 +47,15 @@ public class SecurityService {
       .signWith(SignatureAlgorithm.HS256, Base64.getEncoder().encodeToString(secret.getBytes()))
       .setExpiration(expirationDate)
       .compact();
-    return new TokenDetails(user.getId(), token, createdDate, expirationDate);
+    return new TokenDetails(user.getId(), token, createdDate, expirationDate, isFirstEnter);
   }
 
-  public Mono<TokenDetails> authentication(String email, String password) {
-    return userRepository
+  public Mono<TokenDetails> authentication(User user) {
+    return userRepository.findByEmail(user.getEmail())
+      .map(u -> generateToken(u, false))
+      .switchIfEmpty(Mono.defer(() -> userRepository.save(user).map(u -> generateToken(u, true))));
+  }
+    /*return userRepository
       .findByEmail(email)
       .flatMap(user -> {
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -61,5 +66,5 @@ public class SecurityService {
       })
       .switchIfEmpty(Mono.error(new AuthException(messageSourceService.logMessage("user.not.found.code"),
                                                   messageSourceService.logMessage("user.not.found.message"))));
-  }
+  }*/
 }

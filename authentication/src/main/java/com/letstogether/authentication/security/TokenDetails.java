@@ -6,6 +6,7 @@ public record TokenDetails(
   Long userId,
   String token,
   Date issuedAt,
-  Date expiresAt
+  Date expiresAt,
+  Boolean isFirstEnter
 ) {
 }

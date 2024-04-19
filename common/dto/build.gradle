@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.letstogether'
-version = '1.16-SNAPSHOT'
+version = '1.25-SNAPSHOT'
 
 repositories {
     mavenCentral()

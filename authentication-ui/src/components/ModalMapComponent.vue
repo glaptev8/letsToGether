@@ -10,7 +10,7 @@
       <v-card-text style="height: 300px; width: 100%;">
         <GoogleMap
           clickable
-          api-key="AIzaSyAFj7qH5ub0o-wT-ecPalLQcQZRQrBh11M"
+          api-key="AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
           style='width:100%;  height: 100%'
           :center="center"
           :zoom='zoom'

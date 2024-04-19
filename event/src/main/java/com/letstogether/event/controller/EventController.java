@@ -1,6 +1,5 @@
 package com.letstogether.event.controller;
 
-import org.bouncycastle.pqc.crypto.newhope.NHSecretKeyProcessor.PartyUBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.letstogether.dto.EventDto;
 import com.letstogether.dto.EventFilterDto;
-import com.letstogether.dto.EventStatus;
+import com.letstogether.dto.EventReviewDto;
+import com.letstogether.dto.FindReviewRequestDto;
+import com.letstogether.dto.ReviewDto;
 import com.letstogether.dto.UpdateStatusRequestDto;
 import com.letstogether.event.entity.Event;
 import com.letstogether.event.entity.EventToUser;
@@ -59,7 +60,7 @@ public class EventController {
 
   @PostMapping("/unsubscribe")
   public Mono<Boolean> unsubscribe(@RequestHeader("X-USER-ID") Long userId,
-                                 @RequestParam(name = "eventId") Long eventId) {
+                                   @RequestParam(name = "eventId") Long eventId) {
     return eventService.unsubscribe(eventId, userId);
   }
 
@@ -84,15 +85,32 @@ public class EventController {
 
   @PostMapping("/byfilter")
   public Flux<EventDto> byFilter(@RequestBody EventFilterDto filter, @RequestHeader("X-USER-ID") Long userId) {
-    return eventService.getEventsByFilter(filter, userId)
+    Long id = filter.getUserId() != null ? filter.getUserId() : userId;
+    return eventService.getEventsByFilter(filter, id)
       .map(mapper::toDto);
   }
 
-  @PostMapping("/cancel")
-  public Mono<EventDto> cancel(@RequestHeader("X-USER-ID") Long userId,
-                               @RequestBody UpdateStatusRequestDto updateStatusRequestDto) {
+  @PostMapping("/updatestatus")
+  public Mono<EventDto> updateStatus(@RequestHeader(value = "X-USER-ID", required = false) Long userId,
+                                     @RequestBody UpdateStatusRequestDto updateStatusRequestDto) {
     return eventService
       .updateStatus(updateStatusRequestDto.getEventId(), userId, updateStatusRequestDto.getEventStatus())
       .map(mapper::toDto);
+  }
+
+  @PostMapping("/review/check")
+  public Mono<Boolean> checkReview(@RequestHeader(value = "X-USER-ID") Long userId, @RequestBody ReviewDto reviewDto) {
+    return eventService.reviewCheck(userId, reviewDto);
+  }
+
+  @PostMapping("/review")
+  public Mono<Void> review(@RequestHeader(value = "X-USER-ID") Long userId, @RequestBody ReviewDto reviewDto) {
+    return eventService.review(userId, reviewDto);
+  }
+
+  @PostMapping("/all/review")
+  public Flux<EventReviewDto> getReview(@RequestBody FindReviewRequestDto findReviewDto) {
+    return eventService.getEventReviews(findReviewDto)
+      .map(mapper::eventReviewDto);
   }
 }

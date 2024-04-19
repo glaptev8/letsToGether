@@ -2,14 +2,14 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres
+    image: postgis/postgis
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - ./data2/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
     ports:
-      - 5432:5432
+      - "5432:5432"
   nexus:
     image: klo2k/nexus3
     container_name: nexus

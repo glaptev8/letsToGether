@@ -2,7 +2,11 @@ import axios from 'axios';
 
 export const fetchAvatarsByUserIds = async (userIds) => {
   try {
-    const response = await axios.post(`/auth/v1/users/avatar`, userIds);
+    const requestBody = {
+      usersId: userIds, // убедитесь, что userIds это массив чисел
+    };
+
+    const response = await axios.post(`/auth/v1/users`, requestBody);
     return response.data; // Предполагается, что API возвращает массив объектов с информацией об аватарах
   } catch (error) {
     console.error("Ошибка при получении аватаров пользователей:", error);

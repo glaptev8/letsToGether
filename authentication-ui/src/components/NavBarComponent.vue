@@ -11,11 +11,11 @@
     <template v-if="!authStore.isAuth">
       <!-- Кнопки входа и регистрации в правом углу -->
       <v-btn text @click="showDialogLogIn = true" class="white--text mr-2">Log In</v-btn>
-      <v-btn text @click="showDialogRegistration = true" class="white--text">Registration</v-btn>
-      <ModalWindowRegistrationComponent v-model="showDialogRegistration" />
       <ModalWindowLogInComponent v-model="showDialogLogIn" />
     </template>
     <template v-else>
+      <v-btn text @click="showDialogRegistration = true" class="white--text">Profile</v-btn>
+      <ModalWindowProfileComponent v-model="showDialogRegistration" />
       <v-btn text @click="logOut" class="white--text mr-2">LogOut</v-btn>
     </template>
   </v-app-bar>
@@ -26,13 +26,13 @@ import {authData} from '@/stores/auth';
 const authStore = authData();
 </script>
 <script>
-import ModalWindowRegistrationComponent from '@/components/ModalWindowRegistrationComponent.vue';
+import ModalWindowProfileComponent from '@/components/ModalWindowProfileComponent.vue';
 import ModalWindowLogInComponent from '@/components/ModalWindowLogInComponent.vue';
 import { authData } from '@/stores/auth';
 
 export default {
   name: "NavBarComponent",
-  components: { ModalWindowLogInComponent, ModalWindowRegistrationComponent },
+  components: { ModalWindowLogInComponent, ModalWindowProfileComponent },
   data() {
     return {
       showDialogRegistration: false,
@@ -42,6 +42,15 @@ export default {
   methods: {
     logOut() {
       authData().logOut();
+    }
+  },
+  mounted() {
+    const params = new URLSearchParams(window.location.search);
+    const isFirstEnter = params.get('isFirstEnter');
+    if (isFirstEnter === 'true') {
+      this.showDialogRegistration = true
+      params.delete('isFirstEnter')
+      window.history.pushState({}, '', `${window.location.pathname}?${params}`);
     }
   }
 }

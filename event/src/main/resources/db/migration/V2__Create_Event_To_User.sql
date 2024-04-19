@@ -1,4 +1,4 @@
-create table event_to_user (
+create table if not exists event_to_user (
     id         bigserial
         constraint event_to_user_id_pk
             primary key,

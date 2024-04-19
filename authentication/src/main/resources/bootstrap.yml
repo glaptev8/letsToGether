@@ -8,6 +8,24 @@ spring:
         enabled: true
       name: authentication
       profile: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
+            redirect-uri: "http://localhost:8082/login/oauth2/code/google"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
+            user-name-attribute: name
+
 
 springdoc:
   swagger-ui:
