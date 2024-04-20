@@ -106,3 +106,12 @@ services:
       LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
       SPRING_PROFILES_ACTIVE: "qa"
       REDIS_URL: "redis"
+  lets-to-gether-event-consumer:
+    image: "glaptev8/lets-to-gether-event-consumer:0.0"
+    environment:
+      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
+      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
+      SPRING_PROFILES_ACTIVE: "qa"
+      RABBITMQ_URL: "rabbitmq"
+      RABBITMQ_USER: "user"
+      RABBITMQ_PASSWORD: "password"
