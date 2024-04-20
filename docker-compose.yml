@@ -52,3 +52,6 @@ services:
       - "8080:8080"
     environment:
       LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
+      DATASOURCE_USERNAME: "postgres"
+      DATASOURCE_PASSWORD: "postgres"
+      SPRING_PROFILES_ACTIVE: "qa"

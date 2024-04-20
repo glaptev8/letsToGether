@@ -1,0 +1,9 @@
+spring:
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8080
+      name: gateway
+      profile: dev

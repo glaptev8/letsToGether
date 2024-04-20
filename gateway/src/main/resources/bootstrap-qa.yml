@@ -1,0 +1,9 @@
+spring:
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      enabled: true
+      uri: ${LETS_TO_GETHER_CONFIG}
+      name: gateway
+      profile: qa

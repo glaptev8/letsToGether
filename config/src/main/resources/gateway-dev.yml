@@ -20,3 +20,22 @@ spring:
             - Path=/chat/**
       websocket:
         enabled: true
+    httpclient:
+      wiretap: true
+    httpserver:
+      wiretap: true
+    globalcors:
+      corsConfigurations:
+        '[/**]':
+          allowedOrigins: "http://localhost:3000"
+          allowedMethods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          allowedHeaders: "*"
+          allowCredentials: true
+    global-filter:
+      websocket-routing:
+        enabled: true
