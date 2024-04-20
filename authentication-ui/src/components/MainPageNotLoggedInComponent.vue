@@ -32,6 +32,10 @@ const items = ref([
     description: 'Свидания, походы в кино или катание на велосипедах. Отличный способ расслабиться и насладиться жизнью.',
   }
 ]);
+
+onMounted(() => {
+  console.log(`${process.env.LETS_TO_GETHER_IP}`)
+})
 </script>
 
 

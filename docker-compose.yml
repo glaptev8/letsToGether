@@ -38,3 +38,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  lets-to-gether-ui:
+    image: "glaptev8/lets-to-gether-ui:0.0"
+    ports:
+      - "3000:80"
+  lets-to-gether-eureka:
+    image: "glaptev8/lets-to-gether-eureka:0.0"
+    ports:
+      - "8761:8761"
