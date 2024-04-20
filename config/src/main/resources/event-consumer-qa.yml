@@ -3,6 +3,6 @@ spring:
     name: event-consumer
   rabbitmq:
     host: ${RABBITMQ_URL}
-    port: 5673
+    port: 5672
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
