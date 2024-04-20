@@ -46,3 +46,7 @@ services:
     image: "glaptev8/lets-to-gether-eureka:0.0"
     ports:
       - "8761:8761"
+  lets-to-gether-config:
+    image: "glaptev8/lets-to-gether-config:0.0"
+    ports:
+      - ""

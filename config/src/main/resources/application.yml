@@ -9,8 +9,3 @@ spring:
           force-pull: true
   application:
     name: config
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
