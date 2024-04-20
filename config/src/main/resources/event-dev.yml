@@ -10,5 +10,3 @@ spring:
     port: 5673
     username: user
     password: password
-server:
-  port: 8083

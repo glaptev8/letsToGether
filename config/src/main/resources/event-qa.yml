@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: event
+  r2dbc:
+    url: ${R2DBC_DATASOURCE_URL}
+  flyway:
+    url: ${FLYWAY_DATASOURCE_URL}
+  rabbitmq:
+    host: ${RABBITMQ_URL}
+    port: 5673
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}

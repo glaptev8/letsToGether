@@ -42,7 +42,7 @@ public class WebSecurityConfig {
 
   @Value("${jwt.secret}")
   private String secret;
-  @Value("letstogether.ui.uri")
+  @Value("${letstogether.ui.uri}")
   private String redirectUri;
   private final UserService userService;
   private final String[] publicRoutes = new String[]{

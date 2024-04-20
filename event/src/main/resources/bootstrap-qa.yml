@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        service-id: config
+        enabled: true
+      name: event
+      profile: qa

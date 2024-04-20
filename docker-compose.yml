@@ -82,5 +82,15 @@ services:
       SPRING_PROFILES_ACTIVE: "qa"
       CLIENT_ID: "707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com"
       CLIENT_SECRET: "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"
-      GOOGLE_REDIRECT_URI: "http://lets-to-gether-gateway:8082/login/oauth2/code/google"
+      GOOGLE_REDIRECT_URI: "http://localhost:8082/login/oauth2/code/google"
       AVATAR_FOLDER_PATH: "/app/static"
+
+  lets-to-gether-event:
+    image: "glaptev8/lets-to-gether-event:0.0"
+    environment:
+      R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/event"
+      FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/event"
+      SPRING_PROFILES_ACTIVE: "qa"
+      RABBITMQ_URL: "rabbitmq"
+      RABBITMQ_USER: "user"
+      RABBITMQ_PASSWORD: "password"

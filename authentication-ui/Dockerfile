@@ -16,6 +16,7 @@ RUN yarn install
 
 # Копирование остальных файлов проекта
 COPY . .
+# Копирование конфигурации Nginx
 
 # Сборка приложения
 RUN echo $VITE_LETS_TO_GETHER_GATEWAY
@@ -23,6 +24,9 @@ RUN yarn build
 
 # Финальный этап с Nginx, для раздачи статических файлов
 FROM nginx:stable-alpine as production-stage
+
+# Копирование конфигурации Nginx
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Копирование собранного приложения из предыдущего этапа
 COPY --from=build-stage /app/dist /usr/share/nginx/html
