@@ -2,20 +2,20 @@ spring:
   application:
     name: authentication
   r2dbc:
-    url: r2dbc:pool:postgres://localhost:5432/authentication
+    url: ${R2DBC_DATASOURCE_URL}
   flyway:
-    url: jdbc:postgresql://localhost:5432/authentication
+    url: ${FLYWAY_DATASOURCE_URL}
   security:
     oauth2:
       client:
         registration:
           google:
-            clientId: 707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: ${CLIENT_ID}
+            clientSecret: ${CLIENT_SECRET}
             scope:
               - email
               - profile
-            redirect-uri: "http://localhost:8082/login/oauth2/code/google"
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
         provider:
           google:
             authorization-uri: https://accounts.google.com/o/oauth2/auth
@@ -23,13 +23,10 @@ spring:
             user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
             user-name-attribute: name
 
-server:
-  port: 8081
-
 jwt:
   secret: 426b1066314ea793aa5d0907d7323310eef672ab280958f1f667be70c61c9abf
   expiration: 3600
   issuer: letstogether
 
 upload:
-  path: /Users/glelap/projects/letsToGether/static/
+  path: {AVATAR_FOLDER_PATH}
