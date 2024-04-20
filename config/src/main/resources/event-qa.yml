@@ -6,7 +6,7 @@ spring:
   flyway:
     url: ${FLYWAY_DATASOURCE_URL}
   rabbitmq:
-    host: ${RABBITMQ_URL}
+    host: "rabbitmq"
     port: 5672
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
