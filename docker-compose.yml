@@ -63,6 +63,20 @@ services:
       LETS_TO_GETHER_UI: "http://lets-to-gether-ui:80"
       LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
       LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
+      SPRING_PROFILES_ACTIVE: "qa"
+  lets-to-gether-authentication:
+    image: "glaptev8/lets-to-gether-authentication:0.0"
+    volumes:
+      - /Users/glelap/projects/letsToGether/static/:/app/static
+    environment:
+      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
+      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
       DATASOURCE_USERNAME: "postgres"
       DATASOURCE_PASSWORD: "postgres"
       SPRING_PROFILES_ACTIVE: "qa"
+      CLIENT_ID: "707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com"
+      CLIENT_SECRET: "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"
+      GOOGLE_REDIRECT_URI: "http://lets-to-gether-gateway:8082/login/oauth2/code/google"
+      R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/authentication"
+      FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/authentication"
+      AVATAR_FOLDER_PATH: "/app/static"

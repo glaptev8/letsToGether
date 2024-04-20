@@ -29,4 +29,4 @@ jwt:
   issuer: letstogether
 
 upload:
-  path: {AVATAR_FOLDER_PATH}
+  path: ${AVATAR_FOLDER_PATH}
