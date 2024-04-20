@@ -10,10 +10,15 @@ COPY package.json yarn.lock ./
 # Установка зависимостей с использованием yarn
 RUN yarn install
 
+# Передаем переменные окружения на этапе сборки
+#ARG VITE_LETS_TO_GETHER_GATEWAY
+#ENV VITE_LETS_TO_GETHER_GATEWAY=$VITE_LETS_TO_GETHER_GATEWAY
+
 # Копирование остальных файлов проекта
 COPY . .
 
 # Сборка приложения
+RUN echo $VITE_LETS_TO_GETHER_GATEWAY
 RUN yarn build
 
 # Финальный этап с Nginx, для раздачи статических файлов

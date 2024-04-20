@@ -24,7 +24,7 @@ export const staticData = defineStore('static', {
         this.eventStatuses = JSON.parse(eventStatuses)
         return;
       }
-
+      console.log(axios.getUri() + '  sdasd ')
       axios.get('/static/v1')
         .then(response => {
           console.log(response)

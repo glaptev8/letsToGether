@@ -42,6 +42,8 @@ public class WebSecurityConfig {
 
   @Value("${jwt.secret}")
   private String secret;
+  @Value("letstogether.ui.uri")
+  private String redirectUri;
   private final UserService userService;
   private final String[] publicRoutes = new String[]{
     "/auth/v1/login/google",
@@ -87,7 +89,7 @@ public class WebSecurityConfig {
                                      .providerId(oauthUser.getAttribute("sub"))
                                      .build())
             .flatMap(token -> {
-              String redirectUrl = "http://localhost:3000/auth-success?token=" + token.token() + "&userId=" + token.userId() + "&isFirstEnter=" + token.isFirstEnter();
+              String redirectUrl = redirectUri + "/auth-success?token=" + token.token() + "&userId=" + token.userId() + "&isFirstEnter=" + token.isFirstEnter();
               ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
               response.setStatusCode(HttpStatus.SEE_OTHER);
               response.getHeaders().setLocation(URI.create(redirectUrl));

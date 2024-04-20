@@ -8,3 +8,4 @@ spring:
         enabled: true
       name: authentication
       profile: qa
+      uri: ${LETS_TO_GETHER_CONFIG}

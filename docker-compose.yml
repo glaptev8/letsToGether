@@ -40,8 +40,11 @@ services:
       retries: 5
   lets-to-gether-ui:
     image: "glaptev8/lets-to-gether-ui:0.0"
+    environment:
+      VITE_LETS_TO_GETHER_GATEWAY: "http://lets-to-gether-gateway:8080"
     ports:
       - "3000:80"
+    pull_policy: always
   lets-to-gether-eureka:
     image: "glaptev8/lets-to-gether-eureka:0.0"
     ports:
@@ -69,14 +72,15 @@ services:
     volumes:
       - /Users/glelap/projects/letsToGether/static/:/app/static
     environment:
+      LETS_TO_GETHER_UI_IRI: "http://localhost:3000"
       LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
       LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
       DATASOURCE_USERNAME: "postgres"
       DATASOURCE_PASSWORD: "postgres"
+      R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/authentication"
+      FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/authentication"
       SPRING_PROFILES_ACTIVE: "qa"
       CLIENT_ID: "707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com"
       CLIENT_SECRET: "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"
       GOOGLE_REDIRECT_URI: "http://lets-to-gether-gateway:8082/login/oauth2/code/google"
-      R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/authentication"
-      FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/authentication"
       AVATAR_FOLDER_PATH: "/app/static"

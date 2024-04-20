@@ -28,5 +28,9 @@ jwt:
   expiration: 3600
   issuer: letstogether
 
+letstogether:
+  ui:
+    uri: ${LETS_TO_GETHER_UI_IRI}
+
 upload:
   path: ${AVATAR_FOLDER_PATH}

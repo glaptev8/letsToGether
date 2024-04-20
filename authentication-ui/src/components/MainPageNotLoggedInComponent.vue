@@ -15,6 +15,7 @@
 <script setup>
 import ActivityCard from '@/components/ActivityCardComponent.vue';
 import { ref } from 'vue';
+
 const items = ref([
   {
     title: 'Спорт',
@@ -33,9 +34,6 @@ const items = ref([
   }
 ]);
 
-onMounted(() => {
-  console.log(`${process.env.LETS_TO_GETHER_IP}`)
-})
 </script>
 
 
