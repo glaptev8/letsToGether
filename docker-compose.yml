@@ -63,7 +63,7 @@ services:
     ports:
       - "8082:8080"
     environment:
-      LETS_TO_GETHER_UI: "http://lets-to-gether-ui:80"
+      LETS_TO_GETHER_UI: "http://localhost:3000"
       LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
       LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
       SPRING_PROFILES_ACTIVE: "qa"
@@ -88,6 +88,10 @@ services:
   lets-to-gether-event:
     image: "glaptev8/lets-to-gether-event:0.0"
     environment:
+      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
+      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
+      DATASOURCE_USERNAME: "postgres"
+      DATASOURCE_PASSWORD: "postgres"
       R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/event"
       FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/event"
       SPRING_PROFILES_ACTIVE: "qa"

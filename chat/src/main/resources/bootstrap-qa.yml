@@ -6,6 +6,6 @@ spring:
       discovery:
         service-id: config
         enabled: true
-      name: event
+      name: chat
       uri: ${LETS_TO_GETHER_CONFIG}
       profile: qa

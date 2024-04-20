@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: chat
+  data:
+    redis:
+      host: ${REDIS_URL}
+      port: 6379
