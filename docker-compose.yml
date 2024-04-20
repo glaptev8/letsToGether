@@ -49,4 +49,6 @@ services:
   lets-to-gether-config:
     image: "glaptev8/lets-to-gether-config:0.0"
     ports:
-      - ""
+      - "8080:8080"
+    environment:
+      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"

@@ -13,4 +13,4 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${LETS_TO_GETHER_IP}/eureka/
+      defaultZone: ${LETS_TO_GETHER_EUREKA_IP}
