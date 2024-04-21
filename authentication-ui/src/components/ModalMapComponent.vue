@@ -10,7 +10,7 @@
       <v-card-text style="height: 300px; width: 100%;">
         <GoogleMap
           clickable
-          api-key="AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
+          :api-key="apiKey"
           style='width:100%;  height: 100%'
           :center="center"
           :zoom='zoom'
@@ -50,6 +50,7 @@ const props = defineProps({
 
 const dialog = ref(props.modelValue);
 const emits = defineEmits(['update:modelValue']);
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 const close = () => {
   emits('update:modelValue', false)

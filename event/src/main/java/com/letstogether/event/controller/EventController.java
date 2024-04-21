@@ -36,6 +36,7 @@ public class EventController {
   @PostMapping
   public Mono<EventDto> create(@RequestBody Event event, @RequestHeader("X-USER-ID") Long userId) {
     event.setCreatorId(userId);
+    log.info("Creating event {}", event);
     return eventService.save(event)
       .map(mapper::toDto);
   }

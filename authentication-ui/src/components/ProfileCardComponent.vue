@@ -2,7 +2,7 @@
   <div class="profile-card">
     <div class="profile-header">
       <v-avatar size="140">
-        <img v-if="!imageError" :src="`http://localhost:8082/auth/v1/img/${participant.pathToAvatar}`" @error="handleImageError" alt="User Avatar">
+        <img v-if="!imageError" width="130" height="130" :src="`http://localhost:8082/auth/v1/img/${participant.pathToAvatar}`" @error="handleImageError" alt="User Avatar">
         <span v-else class="avatar-initials">{{ initials }}</span>
       </v-avatar>
     </div>

@@ -37,7 +37,7 @@
         <GoogleMap
           ref="mapRef"
           clickable
-          api-key="AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
+          :api-key="apiKey"
           :center="{
             lat: filterState.lat,
             lng: filterState.lng
@@ -130,6 +130,8 @@ function handleFilterUpdate(newFilter) {
   filterState.value = { ...filterState.value, ...newFilter };
 }
 
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+
 let closeModalIfMap = () => {
   dialogVisible.value = false;
 }
@@ -140,7 +142,12 @@ const selectedEvent = ref(null);
 
 onMounted(async () => {
   try {
-
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('isFirstEnter')) { // Проверяем, существует ли параметр
+      params.delete('isFirstEnter');
+      const query = params.toString();
+      window.history.replaceState({}, '', `${window.location.pathname}${query ? '?' + query : ''}`);
+    }
     const response = await axios.post('/event/v1/byfilter', filterState.value)
     if (response.status === 200) {
       subscribed.value = false

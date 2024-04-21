@@ -51,9 +51,9 @@ public class EventServiceImpl implements EventService {
   @Override
   public Mono<Event> save(Event event) {
     log.info("save event: {}", event);
-    if ((event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate()) || event.getStartDate().isBefore(LocalDateTime.now().plusHours(3)))) {
+    /*if ((event.getEndDate() != null && event.getEndDate().isBefore(event.getStartDate()) || event.getStartDate().isBefore(LocalDateTime.now().plusHours(3)))) {
       return Mono.error(new ApiException("EVENT_ERROR", "End date is before start date or in the past")); // TODO: 2024-03-27 EventException
-    }
+    }*/
     event.setStatus(PLANNING);
     return transactionalOperator.transactional(
       eventRepository

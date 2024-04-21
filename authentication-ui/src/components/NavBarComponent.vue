@@ -35,7 +35,7 @@ export default {
   components: { ModalWindowLogInComponent, ModalWindowProfileComponent },
   data() {
     return {
-      showDialogRegistration: false,
+      showDialogProfile: false,
       showDialogLogIn: false,
     };
   },
@@ -46,11 +46,11 @@ export default {
   },
   mounted() {
     const params = new URLSearchParams(window.location.search);
-    const isFirstEnter = params.get('isFirstEnter');
-    if (isFirstEnter === 'true') {
-      this.showDialogRegistration = true
-      params.delete('isFirstEnter')
-      window.history.pushState({}, '', `${window.location.pathname}?${params}`);
+    if (params.has('isFirstEnter')) {
+      const isFirstEnter = params.get('isFirstEnter');
+      if (isFirstEnter === 'true') {
+        this.showDialogProfile = true;
+      }
     }
   }
 }

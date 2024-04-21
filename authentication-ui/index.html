@@ -2,16 +2,18 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="/favicon.ico" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4&libraries=places"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LetsToGether</title>
+    <meta charset="UTF-8"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <script>
+      document.write(`<script src="https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places"><\/script>`);
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LetsToGether</title>
 </head>
 
 <body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
+<div id="app"></div>
+<script type="module" src="/src/main.js"></script>
 </body>
 
 </html>

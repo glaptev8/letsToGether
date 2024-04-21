@@ -35,7 +35,7 @@
                     ref="mapRef"
                     clickable
                     @click="addMarkerByClick"
-                    api-key="AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
+                    :api-key="apiKey"
                     :center='event.center'
                     :zoom='12'
                     style='width:100%;  height: 400px;'
@@ -75,6 +75,8 @@ const props = defineProps({
 });
 
 const dialog = ref(false);
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 const emit = defineEmits(['update:modelValue']);
 watch(() => props.modelValue, (newVal) => {
   dialog.value = newVal;
@@ -206,7 +208,7 @@ let setStreetAddressFrom = async (lat, long) => {
       lat +
       "," +
       long +
-      "&key=AIzaSyB4w5tqUVKjhupOrG0OLdzD_NvoGpCH6s4"
+      "&key=" + import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     );
     if(data.error_message) {
       console.log(data.error_message)
