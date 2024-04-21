@@ -4,18 +4,19 @@ services:
   postgres:
     image: postgis/postgis
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./data2/db:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
   nexus:
     image: klo2k/nexus3
     container_name: nexus
@@ -23,15 +24,17 @@ services:
       - "8090:8081"
     volumes:
       - ./nexus-data:/nexus-data
+
   redis:
     image: "redis:latest"
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
   rabbitmq:
     image: "myrabbitmq:3-management"
     ports:
@@ -39,33 +42,36 @@ services:
       - "15673:15672" # Web management interface
     environment:
       RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "password"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
       RABBITMQ_DEFAULT_VHOST: "/"
     volumes:
       - "./rabbitmq_data:/var/lib/rabbitmq"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
       interval: 30s
       timeout: 10s
       retries: 5
+
   lets-to-gether-ui:
     image: "glaptev8/lets-to-gether-ui:0.0"
     environment:
-      VITE_LETS_TO_GETHER_GATEWAY: "http://lets-to-gether-gateway:8080"
+      VITE_LETS_TO_GETHER_GATEWAY: ${VITE_LETS_TO_GETHER_GATEWAY}
     ports:
       - "3000:80"
     pull_policy: always
+
   lets-to-gether-eureka:
     image: "glaptev8/lets-to-gether-eureka:0.0"
     ports:
       - "8761:8761"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
   lets-to-gether-config:
     image: "glaptev8/lets-to-gether-config:0.0"
     ports:
@@ -73,16 +79,17 @@ services:
     depends_on:
       - lets-to-gether-eureka
     environment:
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      DATASOURCE_USERNAME: "postgres"
-      DATASOURCE_PASSWORD: "postgres"
-      SPRING_PROFILES_ACTIVE: "qa"
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
   lets-to-gether-gateway:
     image: "glaptev8/lets-to-gether-gateway:0.0"
     ports:
@@ -91,16 +98,17 @@ services:
       - lets-to-gether-eureka
       - lets-to-gether-config
     environment:
-      LETS_TO_GETHER_UI: "http://localhost:3000"
-      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      SPRING_PROFILES_ACTIVE: "qa"
+      LETS_TO_GETHER_UI: ${LETS_TO_GETHER_UI}
+      LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
   lets-to-gether-authentication:
     image: "glaptev8/lets-to-gether-authentication:0.0"
     volumes:
@@ -111,20 +119,20 @@ services:
       - lets-to-gether-gateway
       - postgres
     environment:
-      LETS_TO_GETHER_UI_IRI: "http://localhost:3000"
-      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      DATASOURCE_USERNAME: "postgres"
-      DATASOURCE_PASSWORD: "postgres"
+      LETS_TO_GETHER_UI_IRI: ${LETS_TO_GETHER_UI}
+      LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/authentication"
       FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/authentication"
-      SPRING_PROFILES_ACTIVE: "qa"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       CLIENT_ID: "707124684633-7e5hqvfuua6vivmg7d7uoha52lhevs3b.apps.googleusercontent.com"
       CLIENT_SECRET: "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"
       GOOGLE_REDIRECT_URI: "http://localhost:8082/login/oauth2/code/google"
       AVATAR_FOLDER_PATH: "/app/static/"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -133,16 +141,16 @@ services:
   lets-to-gether-event:
     image: "glaptev8/lets-to-gether-event:0.0"
     environment:
-      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      DATASOURCE_USERNAME: "postgres"
-      DATASOURCE_PASSWORD: "postgres"
+      LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       R2DBC_DATASOURCE_URL: "r2dbc:pool:postgres://postgres:5432/event"
       FLYWAY_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/event"
-      SPRING_PROFILES_ACTIVE: "qa"
-      RABBITMQ_URL: "rabbitmq"
-      RABBITMQ_USER: "user"
-      RABBITMQ_PASSWORD: "password"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     depends_on:
       - lets-to-gether-eureka
       - lets-to-gether-config
@@ -151,7 +159,30 @@ services:
       - rabbitmq
       - postgres
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  lets-to-gether-event-consumer:
+    image: "glaptev8/lets-to-gether-event-consumer:0.0"
+    environment:
+      LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    depends_on:
+      - lets-to-gether-eureka
+      - lets-to-gether-config
+      - lets-to-gether-gateway
+      - lets-to-gether-authentication
+      - lets-to-gether-event
+      - rabbitmq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -160,10 +191,10 @@ services:
   lets-to-gether-chat:
     image: "glaptev8/lets-to-gether-chat:0.0"
     environment:
-      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      SPRING_PROFILES_ACTIVE: "qa"
-      REDIS_URL: "redis"
+      LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
+      LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      REDIS_URL: ${REDIS_URL}
     depends_on:
       - lets-to-gether-eureka
       - lets-to-gether-config
@@ -173,30 +204,7 @@ services:
       - lets-to-gether-event-consumer
       - redis
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
-  lets-to-gether-event-consumer:
-    image: "glaptev8/lets-to-gether-event-consumer:0.0"
-    environment:
-      LETS_TO_GETHER_CONFIG: "http://lets-to-gether-config:8080"
-      LETS_TO_GETHER_EUREKA_IP: "http://lets-to-gether-eureka:8761/eureka/"
-      SPRING_PROFILES_ACTIVE: "qa"
-      RABBITMQ_URL: "rabbitmq"
-      RABBITMQ_USER: "user"
-      RABBITMQ_PASSWORD: "password"
-    depends_on:
-      - lets-to-gether-eureka
-      - lets-to-gether-config
-      - lets-to-gether-gateway
-      - lets-to-gether-authentication
-      - lets-to-gether-event
-      - rabbitmq
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3

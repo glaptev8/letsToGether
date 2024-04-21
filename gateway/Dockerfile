@@ -11,4 +11,4 @@ RUN chmod +x /usr/wait-for-it.sh
 EXPOSE 8080
 
 # Запуск Eureka сервера
-ENTRYPOINT ["/bin/bash", "-c", "for i in {1..3}; do /usr/wait-for-it.sh lets-to-gether-eureka:8761 --timeout=45 --strict && break || echo 'Retrying ($i)...'; done && java -jar gateway-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["/bin/bash", "-c", "for i in {1..3}; do /usr/wait-for-it.sh lets-to-gether-config:8080 --timeout=45 --strict && break || echo 'Retrying ($i)...'; done && java -jar gateway-0.0.1-SNAPSHOT.jar"]
