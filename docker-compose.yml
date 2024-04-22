@@ -98,7 +98,7 @@ services:
       - lets-to-gether-eureka
       - lets-to-gether-config
     environment:
-      LETS_TO_GETHER_UI: ${LETS_TO_GETHER_UI}
+      LETS_TO_GETHER_UI: ${LETS_TO_GETHER_UI_IRI}
       LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
       LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
@@ -119,7 +119,7 @@ services:
       - lets-to-gether-gateway
       - postgres
     environment:
-      LETS_TO_GETHER_UI_IRI: ${LETS_TO_GETHER_UI}
+      LETS_TO_GETHER_UI_IRI: ${LETS_TO_GETHER_UI_IRI}
       LETS_TO_GETHER_CONFIG: ${LETS_TO_GETHER_CONFIG}
       LETS_TO_GETHER_EUREKA_IP: ${LETS_TO_GETHER_EUREKA_IP}
       DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
