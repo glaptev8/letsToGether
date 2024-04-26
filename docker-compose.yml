@@ -58,7 +58,7 @@ services:
     environment:
       VITE_LETS_TO_GETHER_GATEWAY: ${VITE_LETS_TO_GETHER_GATEWAY}
     ports:
-      - "3000:80"
+      - "80:80"
     pull_policy: always
 
   lets-to-gether-eureka:
@@ -83,6 +83,7 @@ services:
       DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
       DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD: ${SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s

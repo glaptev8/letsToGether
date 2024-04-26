@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lets-to-gether-eureka
+  labels:
+    app: lets-to-gether-eureka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lets-to-gether-eureka
+  template:
+    metadata:
+      labels:
+        app: lets-to-gether-eureka
+    spec:
+      containers:
+        - name: lets-to-gether-eureka
+          image: glaptev8/lets-to-gether-eureka:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8761
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lets-to-gether-eureka-service
+spec:
+  selector:
+    app: lets-to-gether-eureka
+  ports:
+    - protocol: TCP
+      port: 8761
+      targetPort: 8761
+  type: ClusterIP
