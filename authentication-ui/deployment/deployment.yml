@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lets-to-gether-ui
+  labels:
+    app: lets-to-gether-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lets-to-gether-ui
+  template:
+    metadata:
+      labels:
+        app: lets-to-gether-ui
+    spec:
+      containers:
+        - name: lets-to-gether-ui
+          image: glaptev8/lets-to-gether-ui:0.0-202404262140
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80  # предполагается, что ваш UI слушает на порту 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lets-to-gether-ui-service
+spec:
+  selector:
+    app: lets-to-gether-ui
+  ports:
+    - protocol: TCP
+      port: 80  # порт, доступный извне
+      targetPort: 80  # порт, на который принимают поды
+  type: LoadBalancer
