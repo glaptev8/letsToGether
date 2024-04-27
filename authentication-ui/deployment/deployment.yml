@@ -16,10 +16,13 @@ spec:
     spec:
       containers:
         - name: lets-to-gether-ui
-          image: glaptev8/lets-to-gether-ui:0.0-202404262140
+          image: glaptev8/lets-to-gether-ui:0.0-202404271308
           imagePullPolicy: Always
           ports:
-            - containerPort: 80  # предполагается, что ваш UI слушает на порту 80
+            - containerPort: 80
+          env:
+            - name: VITE_GATE_WAY_SERVICE
+              value: http://lets-to-gether-gateway-service:8080
 
 ---
 apiVersion: v1
