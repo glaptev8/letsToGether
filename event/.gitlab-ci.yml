@@ -1,0 +1,32 @@
+stages:
+  - build
+  - package
+
+build:
+  image: gradle:latest
+  stage: build
+  tags:
+    - letsToGether
+  script:
+    - ./gradlew build
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 2 mins
+  only:
+    - main
+
+package:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: package
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    - letsToGether
+  script:
+    - chmod +x buildDocker.sh
+    - sh buildDocker.sh
+  only:
+    - main
