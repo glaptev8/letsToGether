@@ -10,7 +10,7 @@ import com.letstogether.dto.UpdateStatusRequestDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@HttpExchange("/event/v1")
+@HttpExchange("/api/event/v1")
 public interface EventClient {
   @PostExchange("/updatestatus")
   Mono<EventDto> updateStatus(@RequestBody UpdateStatusRequestDto updateStatusRequest);

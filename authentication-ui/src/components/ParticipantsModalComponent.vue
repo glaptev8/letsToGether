@@ -15,7 +15,7 @@
               <v-list-item>
                 <template v-slot:prepend>
                   <v-avatar>
-                    <img v-if="!imageError" width="50" height="50" :src="`http://localhost:8082/auth/v1/img/${item.pathToAvatar}`" @error="handleImageError" alt="User Avatar">
+                    <img v-if="!imageError" width="50" height="50" :src="`http://localhost:8082/api/auth/v1/img/${item.pathToAvatar}`" @error="handleImageError" alt="User Avatar">
                     <span v-else class="avatar-initials">{{ `${item.firstName[0]}${item.lastName[0]}` }}</span>
                   </v-avatar>
                 </template>

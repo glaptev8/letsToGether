@@ -15,9 +15,9 @@ java {
 repositories {
   mavenCentral()
   maven {
-    url = 'http://localhost:8090/repository/maven-snapshots'
+    url = 'http://37.27.9.212:8081/repository/maven-snapshots'
     credentials {
-      username = "admin"
+      username = "laptev8"
       password = "Hyper1990!"
     }
     allowInsecureProtocol true

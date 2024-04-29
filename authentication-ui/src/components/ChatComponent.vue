@@ -20,7 +20,7 @@
           <div v-for="message in messages" :key="message.id" :class="['message-item', { 'mine': message.userId == authData().userId }]">
             <div class="message-content" id="q">
               <v-avatar class="mr-2" left>
-                <img v-if="!imageError" width="40" height="40" :src="`http://localhost:8082/auth/v1/img/${getPathToAvatar(message.userId)}`" @error="handleImageError" alt="User Avatar">
+                <img v-if="!imageError" width="40" height="40" :src="`http://localhost:8082/api/auth/v1/img/${getPathToAvatar(message.userId)}`" @error="handleImageError" alt="User Avatar">
                 <span v-else class="avatar-initials">{{ getInitials(message.userId) }}</span>
               </v-avatar>
               <span>{{ message.text }}</span>
@@ -108,10 +108,10 @@ function closeChat() {
 }
 
 function initializeWebSocket() {
-  ws.value = new WebSocket(`ws://localhost:8082/chat/socket/${props.event.id}?token=${token}`);
+  ws.value = new WebSocket(`wss://lets-to-gether.online/api/event/chat/socket/${props.event.id}?token=${token}`);
 
   ws.value.onopen = async () => {
-    const response = await axios.post(`/chat/v1/${props.event.id}`)
+    const response = await axios.post(`/api/event/v1/${props.event.id}`)
     if (response.status === 200) {
       messages.value = response.data.messages;
       await nextTick(scrollToBottom);

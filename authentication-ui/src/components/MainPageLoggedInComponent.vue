@@ -148,7 +148,7 @@ onMounted(async () => {
       const query = params.toString();
       window.history.replaceState({}, '', `${window.location.pathname}${query ? '?' + query : ''}`);
     }
-    const response = await axios.post('/event/v1/byfilter', filterState.value)
+    const response = await axios.post('/api/event/v1/byfilter', filterState.value)
     if (response.status === 200) {
       subscribed.value = false
       events.value = response.data;
@@ -181,7 +181,7 @@ let showSuccess = (message) => {
 };
 
 const getUserEvents = async () => {
-  const response = await axios.post("/event/v1/byuser")
+  const response = await axios.post("/api/event/v1/byuser")
   if (response.status === 200) {
     subscribed.value = true
     events.value = response.data
@@ -189,7 +189,7 @@ const getUserEvents = async () => {
 }
 
 const applyFilters = async () => {
-  const response = await axios.post("/event/v1/byfilter", filterState.value)
+  const response = await axios.post("/api/event/v1/byfilter", filterState.value)
   if (response.status === 200) {
     subscribed.value = false
     events.value = response.data

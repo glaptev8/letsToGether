@@ -101,7 +101,7 @@ let showSuccess = (message) => {
 
 const showReviewDialogOpen = async () => {
   try {
-    const response = await axios.post('/event/v1/review/check', {
+    const response = await axios.post('/api/event/v1/review/check', {
       eventId: props.event.id
     });
     if (response.data) {
@@ -118,7 +118,7 @@ const remove = async () => {
     eventId: props.event.id,
     eventStatus: 'CANCELED'
   }
-  const response = await axios.post(`/event/v1/updatestatus`, updateStatusRequestDto)
+  const response = await axios.post(`/api/event/v1/updatestatus`, updateStatusRequestDto)
   if (response && response.status === 200) {
     emit('eventRemoved', props.event.id);
   }
@@ -128,7 +128,7 @@ const remove = async () => {
 }
 
 let subscribe = async () => {
-  const url = !props.subscribed ? `/event/v1/subscribe?eventId=${props.event.id}` : `/event/v1/unsubscribe?eventId=${props.event.id}`
+  const url = !props.subscribed ? `/api/event/v1/subscribe?eventId=${props.event.id}` : `/api/event/v1/unsubscribe?eventId=${props.event.id}`
   const response = await axios.post(url)
   if (response && response.status === 200) {
     emit('eventRemoved', props.event.id);

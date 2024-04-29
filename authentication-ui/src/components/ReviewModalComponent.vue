@@ -38,7 +38,7 @@ watch(() => props.modelValue, (newVal) => {
 
 const submitReview = async () => {
   try {
-    await axios.post('/event/v1/review', {
+    await axios.post('/api/event/v1/review', {
       eventId: props.eventId,
       grade: rating.value,
       message: comment.value

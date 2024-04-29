@@ -12,7 +12,7 @@ import com.letstogether.dto.ChatDto;
 import com.letstogether.dto.MessageDto;
 import reactor.core.publisher.Mono;
 
-@HttpExchange("/chat/v1")
+@HttpExchange("/api/chat/v1")
 public interface ChatClient {
 
   @PostExchange("/adduser")

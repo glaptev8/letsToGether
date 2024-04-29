@@ -149,7 +149,7 @@ const submit = () => {
       formData.append('avatar', avatar.value[0]);
     }
 
-    axios.post('/auth/v1/update', formData)
+    axios.post('/api/auth/v1/update', formData)
       .then(response => {
         successMessage.value = "Информация обновлена";
       })
@@ -174,7 +174,7 @@ watch(avatar, (newValue) => {
 
 onMounted(async () => {
   const userId = authData().userId
-  const response = await axios.get(`/auth/v1/user/${userId}`);
+  const response = await axios.get(`/api/auth/v1/user/${userId}`);
   if (response.status === 200 && response.data) {
     user.value = {
       ...user.value, // сохраняем текущие значения

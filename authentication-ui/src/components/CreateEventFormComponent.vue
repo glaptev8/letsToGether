@@ -128,7 +128,7 @@ async function saveEvent() {
   };
 
   try {
-    const response = await axios.post('/event/v1', eventData);
+    const response = await axios.post('/api/event/v1', eventData);
     if (response.status === 200) {
       dialog.value = false;
       resetForm();

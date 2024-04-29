@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
-@RequestMapping("/event/v1")
+@RequestMapping("/api/event/v1")
 @RequiredArgsConstructor
 public class EventController {
 

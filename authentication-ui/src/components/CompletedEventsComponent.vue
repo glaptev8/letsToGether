@@ -44,7 +44,7 @@ const props = defineProps({
 
 const loadCompletedEvents = async () => {
   try {
-    const response = await axios.post('/event/v1/byfilter', {
+    const response = await axios.post('/api/event/v1/byfilter', {
       eventStatus: 'COMPLETED',
       userId: props.userId,
       own: true
@@ -62,7 +62,7 @@ const loadCompletedEvents = async () => {
 
 const loadReviews = async (event) => {
   try {
-    const response = await axios.post('/event/v1/all/review', { eventsIds: [event.id] });
+    const response = await axios.post('/api/event/v1/all/review', { eventsIds: [event.id] });
     event.reviews = response.data;
     event.averageGrade = calculateAverageGrade(event.reviews);
   } catch (error) {

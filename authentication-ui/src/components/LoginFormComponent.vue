@@ -30,7 +30,7 @@ export default {
   methods: {
     loginWithGoogle() {
       // Перенаправление на endpoint сервера, который инициирует OAuth с Google
-      window.location.href = "http://localhost:8082/api/auth/v1/login/google";
+      window.location.href = "http://lets-to-gether.online/api/auth/v1/login/google";
     }
   }
 };
