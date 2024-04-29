@@ -202,18 +202,18 @@ onUpdated( () => {
 
 let setStreetAddressFrom = async (lat, long) => {
   try {
-    const { data } = await axios.get(
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${apiKey}`;
 
-      "https://maps.googleapis.com/maps/api/geocode/json?latlng=" +
-      lat +
-      "," +
-      long +
-      "&key=" + import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-    );
-    if(data.error_message) {
-      console.log(data.error_message)
-    } else {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+      const data = await response.json();
       event.value.address = data.results[0].formatted_address
+    } catch (error) {
+      console.error('Fetch error:', error);
     }
   } catch (error) {
     console.log(error.message);

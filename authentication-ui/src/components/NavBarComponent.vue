@@ -14,8 +14,8 @@
       <ModalWindowLogInComponent v-model="showDialogLogIn" />
     </template>
     <template v-else>
-      <v-btn text @click="showDialogRegistration = true" class="white--text">Profile</v-btn>
-      <ModalWindowProfileComponent v-model="showDialogRegistration" />
+      <v-btn @click="showDialogProfile = true" class="white--text">Profile</v-btn>
+      <ModalWindowProfileComponent v-model="showDialogProfile" />
       <v-btn text @click="logOut" class="white--text mr-2">LogOut</v-btn>
     </template>
   </v-app-bar>

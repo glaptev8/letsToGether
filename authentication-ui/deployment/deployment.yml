@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: lets-to-gether-ui
-          image: glaptev8/lets-to-gether-ui:0.0-202404271308
+          image: glaptev8/lets-to-gether-ui:0.0-202404282317
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -36,4 +36,4 @@ spec:
     - protocol: TCP
       port: 80  # порт, доступный извне
       targetPort: 80  # порт, на который принимают поды
-  type: LoadBalancer
+  type: ClusterIP

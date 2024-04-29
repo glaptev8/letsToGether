@@ -30,9 +30,7 @@ export default {
   methods: {
     loginWithGoogle() {
       // Перенаправление на endpoint сервера, который инициирует OAuth с Google
-      const gateWay = import.meta.env.VITE_GATE_WAY_SERVICE | 'http://localhost:8082'
-      console.log(import.meta.env.VITE_GATE_WAY_SERVICE)
-      window.location.href = "http://34.88.204.140:8080/auth/v1/login/google";
+      window.location.href = "http://localhost:8082/api/auth/v1/login/google";
     }
   }
 };
