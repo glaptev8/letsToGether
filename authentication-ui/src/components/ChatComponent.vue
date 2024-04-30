@@ -20,7 +20,7 @@
           <div v-for="message in messages" :key="message.id" :class="['message-item', { 'mine': message.userId == authData().userId }]">
             <div class="message-content" id="q">
               <v-avatar class="mr-2" left>
-                <img v-if="!imageError" width="40" height="40" :src="`http://localhost:8082/api/auth/v1/img/${getPathToAvatar(message.userId)}`" @error="handleImageError" alt="User Avatar">
+                <img v-if="!imageError" width="40" height="40" :src="`https://lets-to-gether.online/api/auth/v1/img/${getPathToAvatar(message.userId)}`" @error="handleImageError" alt="User Avatar">
                 <span v-else class="avatar-initials">{{ getInitials(message.userId) }}</span>
               </v-avatar>
               <span>{{ message.text }}</span>

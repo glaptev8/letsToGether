@@ -11,7 +11,7 @@ import router from '@/router'
 import axios from "axios";
 import { authData } from '@/stores/auth';
 
-axios.defaults.baseURL = import.meta.env.VITE_LETS_TO_GETHER_GATEWAY || 'http://localhost:8082';
+axios.defaults.baseURL = 'https://lets-to-gether.online';
 axios.interceptors.request.use((config) => {
   const authData = localStorage.getItem('authData');
   const { token, userId } = authData ? JSON.parse(authData) : {}
