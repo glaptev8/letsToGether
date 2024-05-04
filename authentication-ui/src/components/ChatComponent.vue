@@ -108,16 +108,21 @@ function closeChat() {
 }
 
 function initializeWebSocket() {
-  ws.value = new WebSocket(`wss://lets-to-gether.online/api/event/chat/socket/${props.event.id}?token=${token}`);
+  connect()
+}
+
+function connect() {
+  // Повторная инициализация WebSocket
+  ws.value = new WebSocket(`wss://lets-to-gether.online/api/chat/socket/${props.event.id}?token=${token}`);
 
   ws.value.onopen = async () => {
-    const response = await axios.post(`/api/event/v1/${props.event.id}`)
+    // clearTimeout(timeout);
+    const response = await axios.post(`/api/chat/v1/${props.event.id}`)
     if (response.status === 200) {
       messages.value = response.data.messages;
       await nextTick(scrollToBottom);
     }
   };
-
   ws.value.onmessage = (event) => {
     const message = JSON.parse(event.data);
     messages.value.push(message);
@@ -128,8 +133,11 @@ function initializeWebSocket() {
     console.error('WebSocket error:', error);
   };
 
-  ws.value.onclose = () => {
-    console.log('WebSocket connection closed');
+  ws.onclose = function(e) {
+    console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+    timeout = setTimeout(function() {
+      connect();
+    }, 1000);
   };
 }
 

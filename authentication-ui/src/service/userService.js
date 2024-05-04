@@ -16,7 +16,7 @@ export const fetchAvatarsByUserIds = async (userIds) => {
 
 export const fetchUserIdsByEvent = async (eventId) => {
   try {
-    const response = await axios.get(`/event/v1/users/event/${eventId}`);
+    const response = await axios.get(`/api/event/v1/users/event/${eventId}`);
     return response.data.map(user => user.userId);
   } catch (error) {
     console.error("Ошибка при получении данных пользователей:", error);

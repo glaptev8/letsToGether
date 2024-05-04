@@ -75,7 +75,7 @@
           {{ errorMessages }}
         </v-alert>
       </v-card-text>
-      <v-btn color="primary" :disabled="!valid" type="submit">
+      <v-btn color="primary" type="submit">
         save
       </v-btn>
     </v-form>
@@ -125,43 +125,44 @@ const avatarRules = [
 ];
 
 const submit = () => {
-  if (valid.value) {
-    const formData = new FormData();
-    formData.append('firstName', user.value.firstName);
-    formData.append('lastName', user.value.lastName);
-    formData.append('email', user.value.email);
-    if (user.value.gender) {
-      formData.append('gender', user.value.gender);
-    }
-    if (user.value.hobbies) {
-      formData.append('hobbies', user.value.hobbies);
-    }
-    if (user.value.aboutMe) {
-      formData.append('aboutMe', user.value.aboutMe);
-    }
-    if (user.value.age) {
-      formData.append('age', user.value.age);
-    }
-    if (user.value.phone) {
-      formData.append('phone', user.value.phone);
-    }
-    if (avatar.value) {
-      formData.append('avatar', avatar.value[0]);
-    }
-
-    axios.post('/api/auth/v1/update', formData)
-      .then(response => {
-        successMessage.value = "Информация обновлена";
-      })
-      .catch(error => {
-        console.error('failed:', error);
-        if (error.response && error.response.data && error.response.data.body && error.response.data.body.message) {
-          errorMessages.value = error.response.data.body.message;
-        } else {
-          errorMessages.value = "Произошла ошибка. Пожалуйста, попробуйте снова.";
-        }
-      });
+  // Проверка на заполненность всех необходимых полей
+  if (!user.value.firstName || !user.value.lastName || !user.value.email) {
+    errorMessages.value = "Пожалуйста, заполните все обязательные поля.";
+    return;
   }
+
+  // Создание FormData и добавление данных
+  const formData = new FormData();
+  formData.append('firstName', user.value.firstName);
+  formData.append('lastName', user.value.lastName);
+  formData.append('email', user.value.email);
+  if (user.value.gender) {
+    formData.append('gender', user.value.gender);
+  }
+  if (user.value.hobbies) {
+    formData.append('hobbies', user.value.hobbies);
+  }
+  if (user.value.aboutMe) {
+    formData.append('aboutMe', user.value.aboutMe);
+  }
+  if (user.value.age) {
+    formData.append('age', user.value.age);
+  }
+  if (user.value.phone) {
+    formData.append('phone', user.value.phone);
+  }
+  if (avatar.value) {
+    formData.append('avatar', avatar.value[0]);
+  }
+
+  axios.post('/api/auth/v1/update', formData)
+    .then(response => {
+      successMessage.value = "Информация обновлена успешно.";
+    })
+    .catch(error => {
+      console.error('Ошибка отправки:', error);
+      errorMessages.value = "Произошла ошибка. Пожалуйста, попробуйте снова.";
+    });
 };
 
 watch(avatar, (newValue) => {

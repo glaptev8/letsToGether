@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: lets-to-gether-ui
-          image: glaptev8/lets-to-gether-ui:0.0-202404292255
+          image: glaptev8/lets-to-gether-ui:0.0-202405010902
           imagePullPolicy: Always
           ports:
             - containerPort: 80
